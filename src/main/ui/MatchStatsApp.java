@@ -31,12 +31,16 @@ public class MatchStatsApp {
             if (command.equals("exit")) {
                 running = false;
             } else {
-                processCommand(command);
+                try {
+                    processCommand(command);
+                } catch (IllegalStateException e) {
+                    System.out.println(e + " not found");
+                }
             }
         }
     }
 
-    private void processCommand(String s) {
+    private void processCommand(String s) throws IllegalStateException {
         switch (s) {
             case "help":
                 displayOptions();
@@ -50,7 +54,16 @@ public class MatchStatsApp {
             case "add":
                 addLog();
                 break;
+            case "edit":
+                editLog();
+                break;
+            default:
+                throw new IllegalStateException(s);
         }
+    }
+
+    private void editLog() {
+
     }
 
     private void addLog() {

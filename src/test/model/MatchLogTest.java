@@ -4,21 +4,21 @@ import org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class MatchListTest {
-    private MatchList testList;
+class MatchLogTest {
+    private MatchLog testLog;
 
     @BeforeEach
     public void setup() {
-        testList = new MatchList();
+        testLog = new MatchLog("Piper", 5, 4, 50000, true, 8);
     }
 
     @Test
-    public void addLogTest() {
+    public void toStringTest() {
         //stub
     }
 
     @Test
-    public void editListTest() {
+    public void editLogTest() {
         //stub
     }
 }

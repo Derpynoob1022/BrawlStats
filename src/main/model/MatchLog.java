@@ -2,13 +2,13 @@ package model;
 
 // represents the log for a single match of the game having KDR, damage, and the type of character
 public class MatchLog {
-    private final int damage;               // damage dealt in the match
-    private final int kills;                // number of kills
-    private final int deaths;               // number of deaths
-    private final float kdr;                // kill death ratio (kills/deaths)
-    private final String characterName;     // the name of the character
-    private final boolean isMvp;            // played the best in the match or no
-    private final int deltaTrophy;          // how many trophies gained or lost
+    private int damage;               // damage dealt in the match
+    private int kills;                // number of kills
+    private int deaths;               // number of deaths
+    private float kdr;                // kill death ratio (kills/deaths)
+    private String characterName;     // the name of the character
+    private boolean isMvp;            // played the best in the match or no
+    private int deltaTrophy;          // how many trophies gained or lost
 
 
 
@@ -58,8 +58,32 @@ public class MatchLog {
     //REQUIRES: string has to match be one of the fields
     //MODIFIES: this
     //EFFECTS: edit the log by indicating which field the user wants to replace
-    public void editLog(String field, String replacement){
+    public void editLog(String field, String replacement) {
+        switch (field) {
+            case "damage":
+                this.damage = Integer.valueOf(replacement);
+                break;
+            case "kills":
+                this.kills = Integer.valueOf(replacement);
+                this.kdr = (float) kills / deaths;
+                break;
+            case "deaths":
+                this.deaths = Integer.valueOf(replacement);
+                this.kdr = (float) kills / deaths;
+                break;
+            case "name":
+                this.characterName = replacement;
+                break;
+            case "mvp":
+                this.isMvp = Boolean.valueOf(replacement);
+                break;
+            case "trophy":
+                this.deltaTrophy = Integer.valueOf(replacement);
+                break;
 
+            default:
+                throw new IllegalStateException("Unexpected value: " + field);
+        }
     }
 
     //MODIFIES: this
