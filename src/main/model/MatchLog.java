@@ -1,5 +1,7 @@
 package model;
 
+import java.util.InputMismatchException;
+
 // represents the log for a single match of the game having KDR, damage, and the type of character
 public class MatchLog {
     private int damage;               // damage dealt in the match
@@ -24,6 +26,9 @@ public class MatchLog {
         this.deltaTrophy = deltaTrophy;
     }
 
+    public float getKdr() {
+        return this.kdr;
+    }
 
     public int getDamage() {
         return this.damage;
@@ -35,10 +40,6 @@ public class MatchLog {
 
     public int getDeaths() {
         return this.deaths;
-    }
-
-    public float getKdr() {
-        return this.kdr;
     }
 
     public String getCharacterName() {
@@ -54,35 +55,34 @@ public class MatchLog {
     }
 
 
-    //throw exception?
     //REQUIRES: string has to match be one of the fields
     //MODIFIES: this
     //EFFECTS: edit the log by indicating which field the user wants to replace
-    public void editLog(String field, String replacement) {
+    @SuppressWarnings("methodlength")
+    public void editLog(String field, String replacement) throws InputMismatchException {
         switch (field) {
             case "damage":
-                this.damage = Integer.valueOf(replacement);
+                this.damage = Integer.parseInt(replacement);
                 break;
             case "kills":
-                this.kills = Integer.valueOf(replacement);
+                this.kills = Integer.parseInt(replacement);
                 this.kdr = (float) kills / deaths;
                 break;
             case "deaths":
-                this.deaths = Integer.valueOf(replacement);
+                this.deaths = Integer.parseInt(replacement);
                 this.kdr = (float) kills / deaths;
                 break;
             case "name":
                 this.characterName = replacement;
                 break;
             case "mvp":
-                this.isMvp = Boolean.valueOf(replacement);
+                this.isMvp = Boolean.parseBoolean(replacement);
                 break;
             case "trophy":
-                this.deltaTrophy = Integer.valueOf(replacement);
+                this.deltaTrophy = Integer.parseInt(replacement);
                 break;
-
             default:
-                throw new IllegalStateException("Unexpected value: " + field);
+                throw new InputMismatchException(field);
         }
     }
 
@@ -101,6 +101,6 @@ public class MatchLog {
         return "[Character: " + characterName + separator + "Kills: " + kills + separator
                 + "Deaths: " + deaths + separator + "K/D ratio: " + String.format("%.2f", kdr)
                 + separator + "Damage: " + damage + separator + "Star player: " + mvpToString + separator
-                + "Trophy gain or loss: " + String.format("%+d%n", deltaTrophy) + "]";
+                + "Trophy gain: " + String.format("%+d", deltaTrophy) + "]";
     }
 }
