@@ -1,7 +1,10 @@
 package model;
 
+import exception.DivideByZeroException;
+import exception.IndexOutOfBound;
+import exception.NoMatchingFields;
+
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 
 // represents the list of MatchLogs
 public class MatchList {
@@ -17,8 +20,12 @@ public class MatchList {
         return list;
     }
 
-    public MatchLog getLog(int i) {
-        return list.get(i);
+    public MatchLog getLog(int i) throws IndexOutOfBound {
+        if (0 < i || i < (list.size() - 1)) {
+            throw new IndexOutOfBound();
+        } else {
+            return list.get(i);
+        }
     }
 
     public int getSize() {
@@ -33,8 +40,9 @@ public class MatchList {
 
     // MODIFIES: this
     // EFFECTS: removes the last log entry
-    public void editList(int index, String field, String replacement) throws InputMismatchException {
-        this.list.get(index).editLog(field, replacement);
+    public void editList(int index, String field, String rep) throws IndexOutOfBound, NoMatchingFields {
+        MatchLog editedLog = list.get(index);
+        editedLog.editLog(field, rep);
     }
 
     // EFFECTS: produces the total amount of trophies gained or lost
@@ -58,19 +66,41 @@ public class MatchList {
             totalGames++;
         }
 
-        return String.format("%.2f", 100 * starPlayerGames / totalGames);
+        return String.format("%.2f", 100 * starPlayerGames / totalGames) + "%";
     }
 
     // EFFECTS: produces statistics for a certain character
-    public String characterStat(String name) {
+    public String characterStat(String name) throws DivideByZeroException {
 
         return "Statistics for " + name + " "
-                + "[Win rate: " + String.format("%.2f", killDeathRatioCalculator(name)) + " | "
+                + "[Kill Death Ratio: " + String.format("%.2f", killDeathRatioCalculator(name)) + " | "
+                + "Win rate: " + String.format("%.2f", winRateCalculator(name)) + "% | "
                 + "Average damage: " + averageDamageCalculator(name) + "]";
     }
 
     // EFFECTS: calculates the win rate for a certain character name
-    public float killDeathRatioCalculator(String name) {
+    public float winRateCalculator(String name) throws DivideByZeroException {
+        float numberWins = 0;
+        float totalGames = 0;
+
+        for (MatchLog logs : list) {
+            if (logs.getCharacterName().equals(name)) {
+                if (logs.getDeltaTrophy() > 0) {
+                    numberWins++;
+                }
+                totalGames++;
+            }
+        }
+
+        if (totalGames == 0) {
+            throw new DivideByZeroException();
+        } else {
+            return 100 * numberWins / totalGames;
+        }
+    }
+
+    // EFFECTS: calculates the total kill death ratio of a certain character
+    public float killDeathRatioCalculator(String name) throws DivideByZeroException {
         int totalKills = 0;
         int totalDeaths = 0;
 
@@ -80,11 +110,16 @@ public class MatchList {
                 totalDeaths = totalDeaths + logs.getDeaths();
             }
         }
-        return (float) totalKills / totalDeaths;
+
+        if (totalDeaths == 0) {
+            throw new DivideByZeroException();
+        } else {
+            return (float) totalKills / totalDeaths;
+        }
     }
 
     // EFFECTS: calculates the average damage for a certain character name
-    public int averageDamageCalculator(String name) {
+    public int averageDamageCalculator(String name) throws DivideByZeroException {
         int numMatches = 0;
         int totalDamage = 0;
 
@@ -95,6 +130,10 @@ public class MatchList {
             numMatches++;
         }
 
-        return totalDamage / numMatches;
+        if (numMatches == 0) {
+            throw new DivideByZeroException();
+        } else {
+            return totalDamage / numMatches;
+        }
     }
 }

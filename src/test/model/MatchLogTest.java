@@ -13,11 +13,6 @@ class MatchLogTest {
     }
 
     @Test
-    public void toStringTest() {
-        //stub
-    }
-
-    @Test
     public void editLogTest() {
         //stub
     }

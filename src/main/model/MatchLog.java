@@ -1,6 +1,6 @@
 package model;
 
-import java.util.InputMismatchException;
+import exception.NoMatchingFields;
 
 // represents the log for a single match of the game having KDR, damage, and the type of character
 public class MatchLog {
@@ -59,7 +59,7 @@ public class MatchLog {
     //MODIFIES: this
     //EFFECTS: edit the log by indicating which field the user wants to replace
     @SuppressWarnings("methodlength")
-    public void editLog(String field, String replacement) throws InputMismatchException {
+    public void editLog(String field, String replacement) throws NoMatchingFields {
         switch (field) {
             case "damage":
                 this.damage = Integer.parseInt(replacement);
@@ -82,7 +82,7 @@ public class MatchLog {
                 this.deltaTrophy = Integer.parseInt(replacement);
                 break;
             default:
-                throw new InputMismatchException(field);
+                throw new NoMatchingFields();
         }
     }
 
