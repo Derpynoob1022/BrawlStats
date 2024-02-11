@@ -1,12 +1,11 @@
 package ui;
 
-import exception.DivideByZeroException;
-import exception.IndexOutOfBound;
-import exception.NoMatchingFields;
+import model.exception.CharacterDoesNotExistException;
+import model.exception.IndexOutOfBound;
+import model.exception.NoMatchingFields;
 import model.MatchList;
 import model.MatchLog;
 
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 // the user interface for the application
@@ -40,6 +39,15 @@ public class MatchStatsApp {
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: sets up the application
+    private void setup() {
+        log = new MatchList();
+        input = new Scanner(System.in);
+        input.useDelimiter("\n");
+        System.out.println("type \"help\" for more instructions ");
+    }
+
     // EFFECTS: processes user inputs
     private void processCommand(String s) {
         switch (s) {
@@ -58,6 +66,9 @@ public class MatchStatsApp {
             case "edit":
                 editLog();
                 break;
+            case "del":
+                deleteLog();
+                break;
             default:
                 System.out.println("Command not found");
         }
@@ -73,34 +84,32 @@ public class MatchStatsApp {
 
         if (log.getSize() == 0) {
             System.out.println("There is no log yet");
-            return;
         } else {
-            System.out.println("Which log do you want to update?");
-            System.out.println("0 - " + (log.getSize() - 1));
-        }
+            try {
+                System.out.println("Which log do you want to update?");
+                System.out.println("0 - " + (log.getSize() - 1));
 
-        indexNumber = Integer.parseInt(input.next());
-        try {
-            System.out.println(log.getLog(indexNumber).logToString() + " selected!");
-        } catch (IndexOutOfBound e) {
-            System.out.println("Index not found");
-        }
+                indexNumber = Integer.parseInt(input.next());
 
-        System.out.println("Which field do you want to edit?");
-        field = input.next();
-        System.out.println(field + " selected!");
+                System.out.println(log.getLog(indexNumber).logToString() + " selected!");
 
-        System.out.println("What do you want to replace it with?");
-        replacement = input.next();
-        System.out.println(replacement + " confirmed!");
+                System.out.println("Which field do you want to edit?");
+                System.out.println("name/kills/deaths/damage/mvp/trophy");
+                field = input.next();
 
-        try {
-            log.editList(indexNumber, field, replacement);
-            System.out.println("Log changed to: " + log.getLog(indexNumber).logToString());
-        } catch (IndexOutOfBound e) {
-            System.out.println("Index not found");
-        } catch (NoMatchingFields e) {
-            System.out.println("Field not accepted");
+                System.out.println("What do you want to replace it with?");
+                replacement = input.next();
+
+                log.editList(indexNumber, field, replacement);
+                System.out.println("Log changed to: " + log.getLog(indexNumber).logToString());
+
+            } catch (IndexOutOfBound e) {
+                System.out.println("Index not found");
+            } catch (NoMatchingFields e) {
+                System.out.println("Field not accepted");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input");
+            }
         }
     }
 
@@ -133,17 +142,12 @@ public class MatchStatsApp {
 
             System.out.println("Trophy gain or loss?");
             deltaTrophy = input.nextInt();
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input");
-            input.nextLine();
-            return;
-        }
 
-        try {
             log.addLog(new MatchLog(name, kills, deaths, damage, isMvp, deltaTrophy));
             System.out.println("Match added");
         } catch (Exception e) {
-            System.out.println("Cannot add match");
+            System.out.println("Invalid input");
+            input.nextLine();
         }
     }
 
@@ -152,23 +156,49 @@ public class MatchStatsApp {
         printCommandList();
         String statInput = input.next();
 
-        switch (statInput) {
-            case "trophy":
-                System.out.println(log.totalTrophyGain());
-                break;
-            case "character":
-                System.out.println("Select character");
-                String name = input.next();
-                try {
+        try {
+            switch (statInput) {
+                case "trophy":
+                    System.out.println(log.totalTrophyGain());
+                    break;
+                case "character":
+                    System.out.println("Select character");
+                    String name = input.next();
                     System.out.println(log.characterStat(name));
-                } catch (DivideByZeroException e) {
-                    System.out.println("Character does not exist");
+                    break;
+                case "star":
+                    System.out.println(log.starPlayerPercentage());
+                    break;
+                default:
+                    System.out.println("Command not found");
+            }
+        } catch (CharacterDoesNotExistException e) {
+            System.out.println("Character does not exist");
+        }
+    }
+
+    public void deleteLog() {
+        int indexNumber;
+
+        if (log.getSize() == 0) {
+            System.out.println("There is no log yet");
+        } else {
+            try {
+                System.out.println("Which log do you want to delete?");
+                System.out.println("0 - " + (log.getSize() - 1));
+
+                indexNumber = Integer.parseInt(input.next());
+
+                System.out.println(log.getLog(indexNumber).logToString() + " selected!");
+
+                System.out.println("Type \"confirm\" to delete entry");
+                if (input.next().equals("confirm")) {
+                    log.deleteLog(indexNumber);
+                    System.out.println("Entry deleted!");
                 }
-                break;
-            case "star":
-                System.out.println(log.starPlayerPercentage());
-                break;
-            default: System.out.println("Command not found");
+            } catch (IndexOutOfBound e) {
+                System.out.println("Index not found");
+            }
         }
     }
 
@@ -189,15 +219,6 @@ public class MatchStatsApp {
         }
     }
 
-    // MODIFIES: this
-    // EFFECTS: sets up the application
-    private void setup() {
-        log = new MatchList();
-        input = new Scanner(System.in);
-        input.useDelimiter("\n");
-        System.out.println("type \"help\" for more instructions ");
-    }
-
     //EFFECTS: prints out the list of commands
     private void displayOptions() {
         System.out.println("=============================================");
@@ -205,6 +226,7 @@ public class MatchStatsApp {
         System.out.println("To show statistics -> \"stats\"");
         System.out.println("To add a game -> \"add\"");
         System.out.println("To change an entry -> \"edit\"");
+        System.out.println("Delete an entry -> \"del\"");
         System.out.println("quit application -> \"exit\"");
         System.out.println("=============================================");
     }

@@ -1,6 +1,6 @@
 package model;
 
-import exception.NoMatchingFields;
+import model.exception.NoMatchingFields;
 
 // represents the log for a single match of the game having KDR, damage, and the type of character
 public class MatchLog {
@@ -13,8 +13,7 @@ public class MatchLog {
     private int deltaTrophy;          // how many trophies gained or lost
 
 
-
-    //REQUIRES: kills && deaths && damage >= 0
+    //REQUIRES: kills && deaths && damage >= 0 TODO: remove require
     //EFFECTS: creates log object with the given parameters
     public MatchLog(String characterName, int kills, int deaths, int damage, boolean isMvp, int deltaTrophy) {
         this.damage = damage;
@@ -24,10 +23,6 @@ public class MatchLog {
         this.characterName = characterName;
         this.isMvp = isMvp;
         this.deltaTrophy = deltaTrophy;
-    }
-
-    public float getKdr() {
-        return this.kdr;
     }
 
     public int getDamage() {
@@ -89,18 +84,11 @@ public class MatchLog {
     //MODIFIES: this
     //EFFECTS: produce a log entry text with all the information
     public String logToString() {
-        String mvpToString;
         String separator = " | ";
-
-        if (isMvp) {
-            mvpToString = "Yes";
-        } else {
-            mvpToString = "No";
-        }
 
         return "[Character: " + characterName + separator + "Kills: " + kills + separator
                 + "Deaths: " + deaths + separator + "K/D ratio: " + String.format("%.2f", kdr)
-                + separator + "Damage: " + damage + separator + "Star player: " + mvpToString + separator
+                + separator + "Damage: " + damage + separator + "Star player: " + isMvp + separator
                 + "Trophy gain: " + String.format("%+d", deltaTrophy) + "]";
     }
 }

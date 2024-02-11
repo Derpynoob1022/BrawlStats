@@ -1,14 +1,14 @@
 package model;
 
-import exception.DivideByZeroException;
-import exception.IndexOutOfBound;
-import exception.NoMatchingFields;
+import model.exception.IndexOutOfBound;
+import model.exception.NoMatchingFields;
+import model.exception.CharacterDoesNotExistException;
 
 import java.util.ArrayList;
 
 // represents the list of MatchLogs
 public class MatchList {
-    private final ArrayList<MatchLog> list;
+    private ArrayList<MatchLog> list;
 
     //EFFECTS: creates new match list with an empty arraylist
     public MatchList() {
@@ -21,7 +21,7 @@ public class MatchList {
     }
 
     public MatchLog getLog(int i) throws IndexOutOfBound {
-        if (0 < i || i < (list.size() - 1)) {
+        if (i < 0 || i > (list.size() - 1)) {
             throw new IndexOutOfBound();
         } else {
             return list.get(i);
@@ -32,6 +32,20 @@ public class MatchList {
         return list.size();
     }
 
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: deletes a log from the list of matches
+    public void deleteLog(int i) throws IndexOutOfBound {
+        if (i < 0 || i > (list.size() - 1)) {
+            throw new IndexOutOfBound();
+        } else {
+            list.remove(i);
+        }
+    }
+
     // MODIFIES: this
     // EFFECTS: adds a single log entry to the list
     public void addLog(MatchLog m) {
@@ -39,8 +53,9 @@ public class MatchList {
     }
 
     // MODIFIES: this
-    // EFFECTS: removes the last log entry
-    public void editList(int index, String field, String rep) throws IndexOutOfBound, NoMatchingFields {
+    // EFFECTS: edits one of prior logs
+    public void editList(int index, String field, String rep) throws IndexOutOfBound, NoMatchingFields,
+            NumberFormatException {
         MatchLog editedLog = list.get(index);
         editedLog.editLog(field, rep);
     }
@@ -70,16 +85,27 @@ public class MatchList {
     }
 
     // EFFECTS: produces statistics for a certain character
-    public String characterStat(String name) throws DivideByZeroException {
+    public String characterStat(String name) throws CharacterDoesNotExistException {
+        int numberEntries = 0;
+
+        for (MatchLog logs : list) {
+            if (logs.getCharacterName().equals(name)) {
+                numberEntries++;
+            }
+        }
+        if (numberEntries == 0) {
+            throw new CharacterDoesNotExistException();
+        }
 
         return "Statistics for " + name + " "
                 + "[Kill Death Ratio: " + String.format("%.2f", killDeathRatioCalculator(name)) + " | "
                 + "Win rate: " + String.format("%.2f", winRateCalculator(name)) + "% | "
-                + "Average damage: " + averageDamageCalculator(name) + "]";
+                + "Average damage: " + averageDamageCalculator(name) + " | "
+                + "Number of matches played: " + numberEntries + "]";
     }
 
     // EFFECTS: calculates the win rate for a certain character name
-    public float winRateCalculator(String name) throws DivideByZeroException {
+    public float winRateCalculator(String name) {
         float numberWins = 0;
         float totalGames = 0;
 
@@ -91,16 +117,11 @@ public class MatchList {
                 totalGames++;
             }
         }
-
-        if (totalGames == 0) {
-            throw new DivideByZeroException();
-        } else {
-            return 100 * numberWins / totalGames;
-        }
+        return 100 * numberWins / totalGames;
     }
 
     // EFFECTS: calculates the total kill death ratio of a certain character
-    public float killDeathRatioCalculator(String name) throws DivideByZeroException {
+    public float killDeathRatioCalculator(String name) {
         int totalKills = 0;
         int totalDeaths = 0;
 
@@ -112,28 +133,23 @@ public class MatchList {
         }
 
         if (totalDeaths == 0) {
-            throw new DivideByZeroException();
+            return (float) totalKills;
         } else {
             return (float) totalKills / totalDeaths;
         }
     }
 
     // EFFECTS: calculates the average damage for a certain character name
-    public int averageDamageCalculator(String name) throws DivideByZeroException {
+    public int averageDamageCalculator(String name) {
         int numMatches = 0;
         int totalDamage = 0;
 
         for (MatchLog logs : list) {
             if (logs.getCharacterName().equals(name)) {
                 totalDamage = totalDamage + logs.getDamage();
+                numMatches++;
             }
-            numMatches++;
         }
-
-        if (numMatches == 0) {
-            throw new DivideByZeroException();
-        } else {
-            return totalDamage / numMatches;
-        }
+        return totalDamage / numMatches;
     }
 }
