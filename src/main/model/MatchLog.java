@@ -53,7 +53,6 @@ public class MatchLog {
     //REQUIRES: string has to match be one of the fields
     //MODIFIES: this
     //EFFECTS: edit the log by indicating which field the user wants to replace
-    @SuppressWarnings("methodlength")
     public void editLog(String field, String replacement) throws NoMatchingFields {
         switch (field) {
             case "damage":
@@ -76,8 +75,7 @@ public class MatchLog {
             case "trophy":
                 this.deltaTrophy = Integer.parseInt(replacement);
                 break;
-            default:
-                throw new NoMatchingFields();
+            default: throw new NoMatchingFields();
         }
     }
 

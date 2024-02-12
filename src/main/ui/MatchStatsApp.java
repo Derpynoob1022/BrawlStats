@@ -76,11 +76,7 @@ public class MatchStatsApp {
 
     // MODIFIES: this
     // EFFECTS: able to make edits on a log
-    @SuppressWarnings("methodlength")
     private void editLog() {
-        int indexNumber;
-        String field;
-        String replacement;
 
         if (log.getSize() == 0) {
             System.out.println("There is no log yet");
@@ -89,16 +85,16 @@ public class MatchStatsApp {
                 System.out.println("Which log do you want to update?");
                 System.out.println("0 - " + (log.getSize() - 1));
 
-                indexNumber = Integer.parseInt(input.next());
+                int indexNumber = Integer.parseInt(input.next());
 
                 System.out.println(log.getLog(indexNumber).logToString() + " selected!");
 
                 System.out.println("Which field do you want to edit?");
                 System.out.println("name/kills/deaths/damage/mvp/trophy");
-                field = input.next();
+                String field = input.next();
 
                 System.out.println("What do you want to replace it with?");
-                replacement = input.next();
+                String replacement = input.next();
 
                 log.editList(indexNumber, field, replacement);
                 System.out.println("Log changed to: " + log.getLog(indexNumber).logToString());
@@ -115,33 +111,26 @@ public class MatchStatsApp {
 
     // MODIFIES: this
     // EFFECTS: adds a log to the MatchList
-    @SuppressWarnings("methodlength")
     private void addLog() {
-        String name;
-        int damage;
-        int kills;
-        int deaths;
-        boolean isMvp;
-        int deltaTrophy;
 
         try {
             System.out.println("Character name?");
-            name = input.next();
+            String name = input.next();
 
             System.out.println("Damage?");
-            damage = input.nextInt();
+            int damage = input.nextInt();
 
             System.out.println("Kills?");
-            kills = input.nextInt();
+            int kills = input.nextInt();
 
             System.out.println("Deaths?");
-            deaths = input.nextInt();
+            int deaths = input.nextInt();
 
             System.out.println("Star player? true or false");
-            isMvp = input.nextBoolean();
+            boolean isMvp = input.nextBoolean();
 
             System.out.println("Trophy gain or loss?");
-            deltaTrophy = input.nextInt();
+            int deltaTrophy = input.nextInt();
 
             log.addLog(new MatchLog(name, kills, deaths, damage, isMvp, deltaTrophy));
             System.out.println("Match added");
