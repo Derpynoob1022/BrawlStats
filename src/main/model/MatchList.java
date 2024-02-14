@@ -9,12 +9,11 @@ import java.util.ArrayList;
 
 // represents the list of MatchLogs
 public class MatchList {
-    private ArrayList<MatchLog> list;
+    private ArrayList<MatchLog> list;          // new list of logs
 
     //EFFECTS: creates new match list with an empty arraylist
     public MatchList() {
         list = new ArrayList<>();
-        //list.add(new MatchLog("jerry", 233,23,1,true,8)); for testing purposes
     }
 
     public ArrayList<MatchLog> getList() {

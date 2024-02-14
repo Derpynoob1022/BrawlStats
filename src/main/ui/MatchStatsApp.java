@@ -11,8 +11,8 @@ import java.util.Scanner;
 
 // the user interface for the application
 public class MatchStatsApp {
-    private Scanner input;
-    private MatchList log;
+    private Scanner input;           // scanner input
+    private MatchList log;           // the list of matches
 
     public MatchStatsApp() {
         runMatchStatsApp();
@@ -52,9 +52,6 @@ public class MatchStatsApp {
     // EFFECTS: processes user inputs
     private void processCommand(String s) {
         switch (s) {
-            case "help":
-                displayOptions();
-                break;
             case "view logs":
                 displayHistory();
                 break;
@@ -75,7 +72,7 @@ public class MatchStatsApp {
         }
     }
 
-    // MODIFIES: this
+    // MODIFIES: log
     // EFFECTS: able to make edits on a log
     private void editLog() {
 
@@ -110,7 +107,7 @@ public class MatchStatsApp {
         }
     }
 
-    // MODIFIES: this
+    // MODIFIES: log
     // EFFECTS: adds a log to the MatchList
     private void addLog() {
         try {
@@ -169,6 +166,7 @@ public class MatchStatsApp {
         }
     }
 
+    // EFFECTS: deletes a log
     public void deleteLog() {
         int indexNumber;
 
@@ -194,6 +192,7 @@ public class MatchStatsApp {
         }
     }
 
+    // EFFECTS: prints out the list of commands for stats
     private void printCommandList() {
         System.out.println("=============================================");
         System.out.println("What stat do you want to see?");
@@ -203,7 +202,7 @@ public class MatchStatsApp {
         System.out.println("=============================================");
     }
 
-    // EFFECTS: prints out the past 15 matches
+    // EFFECTS: prints out the past matches
     private void displayHistory() {
         for (MatchLog logs : log.getList()) {
             System.out.println(logs.logToString());
