@@ -1,5 +1,6 @@
 package model;
 
+import model.exception.IllegalValueException;
 import model.exception.NoMatchingFields;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,10 +8,42 @@ import org.junit.jupiter.api.Test;
 
 class MatchLogTest {
     private MatchLog testLog;
+    private MatchLog exceptionTestLog;
 
     @BeforeEach
     public void setup() {
-        testLog = new MatchLog("Piper", 5, 4, 50000, true, 8);
+        try {
+            testLog = new MatchLog("Piper", 5, 4, 50000, true, 8);
+        } catch (IllegalValueException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void testConstructorNegKills() {
+        try {
+            testLog = new MatchLog("Piper", -5, 4, 50000, true, 8);
+            fail("Constructor did not throw exception");
+        } catch (IllegalValueException e) {
+        }
+    }
+
+    @Test
+    void testConstructorNegDamage() {
+        try {
+            testLog = new MatchLog("Piper", 5, 4, -50000, true, 8);
+            fail("Constructor did not throw exception");
+        } catch (IllegalValueException e) {
+        }
+    }
+
+    @Test
+    void testConstructorNegDeaths() {
+        try {
+            testLog = new MatchLog("Piper", 5, -4, 50000, true, 8);
+            fail("Constructor did not throw exception");
+        } catch (IllegalValueException e) {
+        }
     }
 
     @Test

@@ -1,6 +1,7 @@
 package ui;
 
 import model.exception.CharacterDoesNotExistException;
+import model.exception.IllegalValueException;
 import model.exception.IndexOutOfBound;
 import model.exception.NoMatchingFields;
 import model.MatchList;
@@ -112,7 +113,6 @@ public class MatchStatsApp {
     // MODIFIES: this
     // EFFECTS: adds a log to the MatchList
     private void addLog() {
-
         try {
             System.out.println("Character name?");
             String name = input.next();
@@ -129,11 +129,14 @@ public class MatchStatsApp {
             System.out.println("Star player? true or false");
             boolean isMvp = input.nextBoolean();
 
-            System.out.println("Trophy gain or loss?");
+            System.out.println("Trophy gain?");
             int deltaTrophy = input.nextInt();
 
             log.addLog(new MatchLog(name, kills, deaths, damage, isMvp, deltaTrophy));
             System.out.println("Match added");
+        } catch (IllegalValueException e) {
+            System.out.println("Cannot accept a negative value");
+            input.nextLine();
         } catch (Exception e) {
             System.out.println("Invalid input");
             input.nextLine();

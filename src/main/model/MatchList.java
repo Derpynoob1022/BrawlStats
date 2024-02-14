@@ -1,5 +1,6 @@
 package model;
 
+import model.exception.IllegalValueException;
 import model.exception.IndexOutOfBound;
 import model.exception.NoMatchingFields;
 import model.exception.CharacterDoesNotExistException;
@@ -48,7 +49,7 @@ public class MatchList {
 
     // MODIFIES: this
     // EFFECTS: adds a single log entry to the list
-    public void addLog(MatchLog m) {
+    public void addLog(MatchLog m) throws IllegalValueException {
         this.list.add(m);
     }
 

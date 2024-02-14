@@ -1,5 +1,6 @@
 package model;
 
+import model.exception.IllegalValueException;
 import model.exception.NoMatchingFields;
 
 // represents the log for a single match of the game having KDR, damage, and the type of character
@@ -13,11 +14,24 @@ public class MatchLog {
     private int deltaTrophy;          // how many trophies gained or lost
 
 
-    //REQUIRES: kills && deaths && damage >= 0 TODO: remove require
+    //REQUIRES: kills && deaths && damage >= 0
     //EFFECTS: creates log object with the given parameters
-    public MatchLog(String characterName, int kills, int deaths, int damage, boolean isMvp, int deltaTrophy) {
+    public MatchLog(String characterName, int kills, int deaths, int damage, boolean isMvp, int deltaTrophy)
+            throws IllegalValueException {
+
+        if (damage < 0) {
+            throw new IllegalValueException();
+        }
         this.damage = damage;
+
+        if (kills < 0) {
+            throw new IllegalValueException();
+        }
         this.kills = kills;
+
+        if (deaths < 0) {
+            throw new IllegalValueException();
+        }
         this.deaths = deaths;
         this.kdr = (float) kills / deaths;
         this.characterName = characterName;
@@ -50,7 +64,6 @@ public class MatchLog {
     }
 
 
-    //REQUIRES: string has to match be one of the fields
     //MODIFIES: this
     //EFFECTS: edit the log by indicating which field the user wants to replace
     public void editLog(String field, String replacement) throws NoMatchingFields {
