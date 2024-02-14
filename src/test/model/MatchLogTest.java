@@ -8,14 +8,13 @@ import org.junit.jupiter.api.Test;
 
 class MatchLogTest {
     private MatchLog testLog;
-    private MatchLog exceptionTestLog;
 
     @BeforeEach
     public void setup() {
         try {
             testLog = new MatchLog("Piper", 5, 4, 50000, true, 8);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog is initiated wrong");
         }
     }
 

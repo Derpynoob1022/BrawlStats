@@ -28,7 +28,7 @@ public class MatchListTest {
             testLog4 = new MatchLog("Jerry", 20, 0, 0, true, 102);
             testLog5 = new MatchLog("Will", 50, 20, 2345878, true, -32);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is initiated wrong");
         }
     }
 
@@ -38,7 +38,7 @@ public class MatchListTest {
         try {
             testList.addLog(testLog1);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         assertEquals(1, testList.getSize());
         try {
@@ -54,7 +54,7 @@ public class MatchListTest {
         try {
             testList.addLog(testLog1);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         assertEquals(1, testList.getSize());
         try {
@@ -70,7 +70,7 @@ public class MatchListTest {
         try {
             testList.addLog(testLog1);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         assertEquals(1, testList.getSize());
         try {
@@ -88,7 +88,7 @@ public class MatchListTest {
             testList.addLog(testLog2);
             testList.addLog(testLog3);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         assertEquals(3, testList.getSize());
         try {
@@ -106,7 +106,7 @@ public class MatchListTest {
         try {
             testList.addLog(testLog1);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         assertEquals(1, testList.getSize());
         try {
@@ -144,14 +144,11 @@ public class MatchListTest {
         assertTrue(testList.isEmpty());
         try {
             testList.addLog(testLog1);
-        } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
-        }
-        try {
             testList.addLog(testLog2);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
+
         try {
             testList.deleteLog(0);
             assertEquals(testLog2, testList.getLog(0));
@@ -167,7 +164,7 @@ public class MatchListTest {
         try {
             testList.addLog(testLog1);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         try {
             testList.editList(0, "kills", "10");
@@ -185,7 +182,7 @@ public class MatchListTest {
         try {
             testList.addLog(testLog1);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         try {
             testList.editList(0, "fjeisofji", "10fj");
@@ -205,7 +202,7 @@ public class MatchListTest {
             testList.addLog(testLog2);
             testList.addLog(testLog3);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         try {
             testList.editList(1, "damage", "3678");
@@ -226,7 +223,7 @@ public class MatchListTest {
         try {
             testList.addLog(testLog3);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
 
         assertEquals("-27", testList.totalTrophyGain());
@@ -242,7 +239,7 @@ public class MatchListTest {
             testList.addLog(testLog4);
             testList.addLog(testLog5);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
 
         assertEquals("+125", testList.totalTrophyGain());
@@ -255,7 +252,7 @@ public class MatchListTest {
             testList.addLog(testLog1);
             testList.addLog(testLog2);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         assertEquals("50.00%", testList.starPlayerPercentage());
     }
@@ -267,7 +264,7 @@ public class MatchListTest {
             testList.addLog(testLog3);
             testList.addLog(testLog2);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         assertEquals("0.00%", testList.starPlayerPercentage());
     }
@@ -287,7 +284,7 @@ public class MatchListTest {
             testList.addLog(testLog4);
             testList.addLog(testLog5);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
 
         assertEquals(50.0, testList.winRateCalculator("Piper"));
@@ -305,7 +302,7 @@ public class MatchListTest {
             testList.addLog(testLog4);
             testList.addLog(testLog5);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
 
         assertEquals((float) 134 / 11, testList.killDeathRatioCalculator("Piper"));
@@ -318,7 +315,7 @@ public class MatchListTest {
         try {
             testList.addLog(testLog4);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
         assertEquals(20, testList.killDeathRatioCalculator("Jerry"));
     }
@@ -333,7 +330,7 @@ public class MatchListTest {
             testList.addLog(testLog4);
             testList.addLog(testLog5);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
 
         assertEquals( 67457/2, testList.averageDamageCalculator("Jerry"));
@@ -351,7 +348,7 @@ public class MatchListTest {
             testList.addLog(testLog4);
             testList.addLog(testLog5);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
 
         try {
@@ -373,7 +370,7 @@ public class MatchListTest {
             testList.addLog(testLog4);
             testList.addLog(testLog5);
         } catch (IllegalValueException e) {
-            throw new RuntimeException(e);
+            fail("testLog(s) is invalid");
         }
 
         try {
