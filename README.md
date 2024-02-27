@@ -37,5 +37,8 @@ feel like school work but rather a hobby.
 - As a user, I want to be able to view my kill/death ratio.
 - As a user, I want to be able to see particular character statistics.
 
+**Phase 2**
+- As a user, I want to be able to save my list of matches I've added
+- As a user, I want to be able to be able to load my saved logs
 
  

@@ -20,7 +20,7 @@ public class MatchListTest {
 
     @BeforeEach
     public void setup() {
-        testList = new MatchList();
+        testList = new MatchList("test");
         try {
             testLog1 = new MatchLog("Piper", 5, 4, 50000, true, 82);
             testLog2 = new MatchLog("Piper", 129, 7, 123415, false, 0);
@@ -30,6 +30,8 @@ public class MatchListTest {
         } catch (IllegalValueException e) {
             fail("testLog(s) is initiated wrong");
         }
+
+        assertEquals("test", testList.getName());
     }
 
     @Test
@@ -46,6 +48,7 @@ public class MatchListTest {
         } catch (IndexOutOfBound e) {
             fail("addLogTest threw a NotExpectedException");
         }
+
     }
 
     @Test

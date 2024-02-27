@@ -6,13 +6,20 @@ import model.exception.IndexOutOfBound;
 import model.exception.NoMatchingFields;
 import model.MatchList;
 import model.MatchLog;
+import persistence.JsonReader;
+import persistence.JsonWriter;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 
 // the user interface for the application
 public class MatchStatsApp {
+    private static final String JSON_DESTINATION = "./data/saved.json";
     private Scanner input;           // scanner input
     private MatchList log;           // the list of matches
+    private JsonWriter jsonWriter;   // writing the json file
+    private JsonReader jsonReader;   // reading the json file
 
     public MatchStatsApp() {
         runMatchStatsApp();
@@ -23,7 +30,7 @@ public class MatchStatsApp {
     // INSPIRED BY THE TELLER APP EXAMPLE!!!
     private void runMatchStatsApp() {
         boolean running = true;
-        String command = null;
+        String command;
 
         setup();
 
@@ -38,44 +45,67 @@ public class MatchStatsApp {
                 processCommand(command);
             }
         }
+        System.out.println("Application closed");
     }
 
     // MODIFIES: this
     // EFFECTS: sets up the application
     private void setup() {
-        log = new MatchList();
+        log = new MatchList("Neo's matches");
         input = new Scanner(System.in);
         input.useDelimiter("\n");
-        System.out.println("type \"help\" for more instructions ");
+        jsonWriter = new JsonWriter(JSON_DESTINATION);
+        jsonReader = new JsonReader(JSON_DESTINATION);
     }
 
     // EFFECTS: processes user inputs
     private void processCommand(String s) {
-        switch (s) {
-            case "view logs":
-                displayHistory();
-                break;
-            case "stats":
-                viewStats();
-                break;
-            case "add":
-                addLog();
-                break;
-            case "edit":
-                editLog();
-                break;
-            case "del":
-                deleteLog();
-                break;
-            default:
-                System.out.println("Command not found");
+        if ("view logs".equals(s)) {
+            displayHistory();
+        } else if ("stats".equals(s)) {
+            viewStats();
+        } else if ("add".equals(s)) {
+            addLog();
+        } else if ("edit".equals(s)) {
+            editLog();
+        } else if ("del".equals(s)) {
+            deleteLog();
+        } else if ("save".equals(s)) {
+            saveWorkRoom();
+        } else if ("load".equals(s)) {
+            loadWorkRoom();
+        } else {
+            System.out.println("Command not found");
+        }
+    }
+
+
+    // EFFECTS: saves the match list to file
+    private void saveWorkRoom() {
+        try {
+            jsonWriter.open();
+            jsonWriter.write(log);
+            jsonWriter.close();
+            System.out.println("Saved " + log.getName() + " to " + JSON_DESTINATION);
+        } catch (FileNotFoundException e) {
+            System.out.println("Unable to write to file: " + JSON_DESTINATION);
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: loads the saved match list from file
+    private void loadWorkRoom() {
+        try {
+            log = jsonReader.read();
+            System.out.println("Loaded " + log.getName() + " from " + JSON_DESTINATION);
+        } catch (IllegalValueException | IOException e) {
+            System.out.println("Unable to read from file: " + JSON_DESTINATION);
         }
     }
 
     // MODIFIES: log
     // EFFECTS: able to make edits on a log
     private void editLog() {
-
         if (log.getSize() == 0) {
             System.out.println("There is no log yet");
         } else {
@@ -132,7 +162,7 @@ public class MatchStatsApp {
             log.addLog(new MatchLog(name, kills, deaths, damage, isMvp, deltaTrophy));
             System.out.println("Match added");
         } catch (IllegalValueException e) {
-            System.out.println("Cannot accept a negative value");
+            System.out.println("Failed to add match, can not accept a negative value");
             input.nextLine();
         } catch (Exception e) {
             System.out.println("Invalid input");
@@ -218,7 +248,9 @@ public class MatchStatsApp {
         System.out.println("To add a game -> \"add\"");
         System.out.println("To change an entry -> \"edit\"");
         System.out.println("Delete an entry -> \"del\"");
-        System.out.println("quit application -> \"exit\"");
+        System.out.println("Save current files -> \"save\"");
+        System.out.println("Load saved files -> \"load\"");
+        System.out.println("Quit application -> \"exit\"");
         System.out.println("=============================================");
     }
 }

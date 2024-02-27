@@ -2,9 +2,11 @@ package model;
 
 import model.exception.IllegalValueException;
 import model.exception.NoMatchingFields;
+import org.json.JSONObject;
+import persistence.Writable;
 
 // represents the log for a single match of the game having KDR, damage, and the type of character
-public class MatchLog {
+public class MatchLog implements Writable {
     private int damage;               // damage dealt in the match
     private int kills;                // number of kills
     private int deaths;               // number of deaths
@@ -102,4 +104,17 @@ public class MatchLog {
                 + separator + "Damage: " + damage + separator + "Star player: " + isMvp + separator
                 + "Trophy gain: " + String.format("%+d", deltaTrophy) + "]";
     }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("name", characterName);
+        json.put("kills", kills);
+        json.put("deaths", deaths);
+        json.put("damage", damage);
+        json.put("isMvp", isMvp);
+        json.put("deltaTrophy", deltaTrophy);
+        return json;
+    }
+
 }

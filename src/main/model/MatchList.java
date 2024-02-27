@@ -4,16 +4,21 @@ import model.exception.IllegalValueException;
 import model.exception.IndexOutOfBound;
 import model.exception.NoMatchingFields;
 import model.exception.CharacterDoesNotExistException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import persistence.Writable;
 
 import java.util.ArrayList;
 
 // represents the list of MatchLogs
-public class MatchList {
+public class MatchList implements Writable {
     private ArrayList<MatchLog> list;          // new list of logs
+    private String userName;                   // name of the user
 
     //EFFECTS: creates new match list with an empty arraylist
-    public MatchList() {
+    public MatchList(String name) {
         list = new ArrayList<>();
+        userName = name;
     }
 
     public ArrayList<MatchLog> getList() {
@@ -26,6 +31,10 @@ public class MatchList {
         } else {
             return list.get(i);
         }
+    }
+
+    public String getName() {
+        return userName;
     }
 
     public int getSize() {
@@ -151,5 +160,23 @@ public class MatchList {
             }
         }
         return totalDamage / numMatches;
+    }
+
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("user", userName);
+        json.put("stats", logsToJson());
+        return json;
+    }
+
+    // EFFECTS: returns matches in this log as a JSON array
+    private JSONArray logsToJson() {
+        JSONArray jsonArray = new JSONArray();
+        for (MatchLog l : list) {
+            jsonArray.put(l.toJson());
+        }
+        return jsonArray;
     }
 }
