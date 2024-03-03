@@ -1,0 +1,21 @@
+{
+    "stats": [
+        {
+            "kills": -5,
+            "isMvp": false,
+            "damage": 100,
+            "name": "Jerry",
+            "deltaTrophy": -8,
+            "deaths": 10
+        },
+        {
+            "kills": 9,
+            "isMvp": true,
+            "damage": 0,
+            "name": "Marcus",
+            "deltaTrophy": 100,
+            "deaths": 9
+        }
+    ],
+    "user": "Neo's matches"
+}

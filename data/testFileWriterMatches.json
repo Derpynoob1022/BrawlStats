@@ -1,0 +1,21 @@
+{
+    "stats": [
+        {
+            "kills": 5,
+            "isMvp": true,
+            "damage": 50000,
+            "name": "Piper",
+            "deltaTrophy": 82,
+            "deaths": 4
+        },
+        {
+            "kills": 129,
+            "isMvp": false,
+            "damage": 123415,
+            "name": "Piper",
+            "deltaTrophy": 0,
+            "deaths": 7
+        }
+    ],
+    "user": "test file"
+}
