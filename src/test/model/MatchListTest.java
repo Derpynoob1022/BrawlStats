@@ -9,6 +9,8 @@ import model.exception.NoMatchingFields;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 
 public class MatchListTest {
     private MatchList testList;
@@ -290,9 +292,9 @@ public class MatchListTest {
             fail("testLog(s) is invalid");
         }
 
-        assertEquals(50.0, testList.winRateCalculator("Piper"));
-        assertEquals(100.0, testList.winRateCalculator("Jerry"));
-        assertEquals(0.0, testList.winRateCalculator("Will"));
+        assertEquals(50.0, testList.winRateCalculator("Piper", testList.getList()));
+        assertEquals(100.0, testList.winRateCalculator("Jerry", testList.getList()));
+        assertEquals(0.0, testList.winRateCalculator("Will", testList.getList()));
     }
 
     @Test
@@ -308,8 +310,8 @@ public class MatchListTest {
             fail("testLog(s) is invalid");
         }
 
-        assertEquals((float) 134 / 11, testList.killDeathRatioCalculator("Piper"));
-        assertEquals((float) 23 / 2, testList.killDeathRatioCalculator("Jerry"));
+        assertEquals((float) 134 / 11, testList.killDeathRatioCalculator("Piper", testList.getList()));
+        assertEquals((float) 23 / 2, testList.killDeathRatioCalculator("Jerry", testList.getList()));
     }
 
     @Test
@@ -320,7 +322,7 @@ public class MatchListTest {
         } catch (IllegalValueException e) {
             fail("testLog(s) is invalid");
         }
-        assertEquals(20, testList.killDeathRatioCalculator("Jerry"));
+        assertEquals(20, testList.killDeathRatioCalculator("Jerry", testList.getList()));
     }
 
     @Test
@@ -336,9 +338,9 @@ public class MatchListTest {
             fail("testLog(s) is invalid");
         }
 
-        assertEquals( 67457/2, testList.averageDamageCalculator("Jerry"));
-        assertEquals( (50000 + 123415) / 2, testList.averageDamageCalculator("Piper"));
-        assertEquals( 2345878, testList.averageDamageCalculator("Will"));
+        assertEquals( 67457/2, testList.averageDamageCalculator("Jerry", testList.getList()));
+        assertEquals( (50000 + 123415) / 2, testList.averageDamageCalculator("Piper", testList.getList()));
+        assertEquals( 2345878, testList.averageDamageCalculator("Will", testList.getList()));
     }
 
     @Test
@@ -380,6 +382,71 @@ public class MatchListTest {
             testList.characterStat("efefsef");
             fail("characterStatTest didn't throw an exception");
         } catch (CharacterDoesNotExistException e) {
+        }
+    }
+
+    @Test
+    public void characterStatLastFewTest() {
+        assertTrue(testList.isEmpty());
+        try {
+            testList.addLog(testLog1);
+            testList.addLog(testLog2);
+            testList.addLog(testLog3);
+            testList.addLog(testLog4);
+            testList.addLog(testLog5);
+        } catch (IllegalValueException e) {
+            fail("testLog(s) is invalid");
+        }
+
+        try {
+            assertEquals("Statistics for Will [Kill Death Ratio: 2.50 |" +
+                    " Win rate: 0.00% | Average damage: 2345878 |" +
+                    " Number of matches played: 1]",testList.characterStatLastFew(3).get(0));
+            assertEquals("Statistics for Jerry [Kill Death Ratio: 11.50 |" +
+                    " Win rate: 50.00% | Average damage: 33728 |" +
+                    " Number of matches played: 2]",testList.characterStatLastFew(3).get(1));
+        } catch (IndexOutOfBound e) {
+            fail("Shouldn't have thrown an exception");
+        }
+    }
+
+    @Test
+    public void characterStatLastFewOverTest() {
+        assertTrue(testList.isEmpty());
+        try {
+            testList.addLog(testLog1);
+            testList.addLog(testLog2);
+            testList.addLog(testLog3);
+            testList.addLog(testLog4);
+            testList.addLog(testLog5);
+        } catch (IllegalValueException e) {
+            fail("testLog(s) is invalid");
+        }
+
+        try {
+            testList.characterStatLastFew(6);
+            fail("Should have thrown an exception");
+        } catch (IndexOutOfBound e) {
+        }
+    }
+
+    @Test
+    public void characterStatLastFewZeroTest() {
+        assertTrue(testList.isEmpty());
+        try {
+            testList.addLog(testLog1);
+            testList.addLog(testLog2);
+            testList.addLog(testLog3);
+            testList.addLog(testLog4);
+            testList.addLog(testLog5);
+        } catch (IllegalValueException e) {
+            fail("testLog(s) is invalid");
+        }
+
+        try {
+            assertEquals(new ArrayList<>(), testList.characterStatLastFew(0));
+        } catch (IndexOutOfBound e) {
+            fail("Shouldn't have thrown an exception");
         }
     }
 }

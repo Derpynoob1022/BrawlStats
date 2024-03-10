@@ -1,4 +1,133 @@
 {
-    "stats": [],
+    "stats": [
+        {
+            "kills": 3,
+            "isMvp": false,
+            "damage": 22181,
+            "name": "Amber",
+            "deltaTrophy": 8,
+            "deaths": 1
+        },
+        {
+            "kills": 3,
+            "isMvp": false,
+            "damage": 43120,
+            "name": "Hank",
+            "deltaTrophy": -7,
+            "deaths": 3
+        },
+        {
+            "kills": 8,
+            "isMvp": false,
+            "damage": 74902,
+            "name": "Hank",
+            "deltaTrophy": 0,
+            "deaths": 4
+        },
+        {
+            "kills": 3,
+            "isMvp": false,
+            "damage": 36124,
+            "name": "Hank",
+            "deltaTrophy": -6,
+            "deaths": 2
+        },
+        {
+            "kills": 3,
+            "isMvp": false,
+            "damage": 43646,
+            "name": "Hank",
+            "deltaTrophy": 8,
+            "deaths": 1
+        },
+        {
+            "kills": 12,
+            "isMvp": true,
+            "damage": 98219,
+            "name": "Angelo",
+            "deltaTrophy": 0,
+            "deaths": 3
+        },
+        {
+            "kills": 10,
+            "isMvp": true,
+            "damage": 59253,
+            "name": "Angelo",
+            "deltaTrophy": 8,
+            "deaths": 1
+        },
+        {
+            "kills": 12,
+            "isMvp": true,
+            "damage": 58382,
+            "name": "Angelo",
+            "deltaTrophy": -5,
+            "deaths": 2
+        },
+        {
+            "kills": 1,
+            "isMvp": false,
+            "damage": 43372,
+            "name": "Angelo",
+            "deltaTrophy": 8,
+            "deaths": 0
+        },
+        {
+            "kills": 2,
+            "isMvp": false,
+            "damage": 54970,
+            "name": "Angelo",
+            "deltaTrophy": -5,
+            "deaths": 2
+        },
+        {
+            "kills": 2,
+            "isMvp": false,
+            "damage": 33874,
+            "name": "Angelo",
+            "deltaTrophy": -5,
+            "deaths": 3
+        },
+        {
+            "kills": 8,
+            "isMvp": true,
+            "damage": 40918,
+            "name": "Angelo",
+            "deltaTrophy": -5,
+            "deaths": 2
+        },
+        {
+            "kills": 6,
+            "isMvp": false,
+            "damage": 46386,
+            "name": "Angelo",
+            "deltaTrophy": -5,
+            "deaths": 4
+        },
+        {
+            "kills": 4,
+            "isMvp": true,
+            "damage": 53886,
+            "name": "Angelo",
+            "deltaTrophy": 8,
+            "deaths": 0
+        },
+        {
+            "kills": 11,
+            "isMvp": true,
+            "damage": 51497,
+            "name": "Angelo",
+            "deltaTrophy": 9,
+            "deaths": 3
+        },
+        {
+            "kills": 11,
+            "isMvp": true,
+            "damage": 100380,
+            "name": "Angelo",
+            "deltaTrophy": 0,
+            "deaths": 0
+        }
+    ],
     "user": "Neo's matches"
 }

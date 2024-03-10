@@ -11,6 +11,10 @@ import persistence.JsonWriter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 // the user interface for the application
@@ -71,9 +75,9 @@ public class MatchStatsApp {
         } else if ("del".equals(s)) {
             deleteLog();
         } else if ("save".equals(s)) {
-            saveWorkRoom();
+            saveMatches();
         } else if ("load".equals(s)) {
-            loadWorkRoom();
+            loadMatches();
         } else {
             System.out.println("Command not found");
         }
@@ -81,7 +85,7 @@ public class MatchStatsApp {
 
 
     // EFFECTS: saves the match list to file
-    private void saveWorkRoom() {
+    private void saveMatches() {
         try {
             jsonWriter.open();
             jsonWriter.write(log);
@@ -94,7 +98,7 @@ public class MatchStatsApp {
 
     // MODIFIES: this
     // EFFECTS: loads the saved match list from file
-    private void loadWorkRoom() {
+    private void loadMatches() {
         try {
             log = jsonReader.read();
             System.out.println("Loaded " + log.getName() + " from " + JSON_DESTINATION);
@@ -174,25 +178,25 @@ public class MatchStatsApp {
     private void viewStats() {
         printCommandList();
         String statInput = input.next();
-
         try {
-            switch (statInput) {
-                case "trophy":
-                    System.out.println(log.totalTrophyGain());
-                    break;
-                case "character":
-                    System.out.println("Select character");
-                    String name = input.next();
-                    System.out.println(log.characterStat(name));
-                    break;
-                case "star":
-                    System.out.println(log.starPlayerPercentage());
-                    break;
-                default:
-                    System.out.println("Command not found");
+            if (statInput.equals("previous")) {
+                System.out.println("select: 1 - " + log.getSize());
+                log.characterStatLastFew(input.nextInt()).forEach(System.out::println);
+            } else if (statInput.equals("character")) {
+                System.out.println("Select character");
+                System.out.println(log.characterStat(input.next()));
+            } else if (statInput.equals("star")) {
+                System.out.println(log.starPlayerPercentage());
+            } else {
+                System.out.println("Command not found");
             }
         } catch (CharacterDoesNotExistException e) {
             System.out.println("Character does not exist");
+        } catch (IndexOutOfBound e) {
+            System.out.println("Not enough matches to view that many previous matches");
+        } catch (Exception e) {
+            System.out.println("Invalid input");
+            input.nextLine();
         }
     }
 
@@ -226,7 +230,7 @@ public class MatchStatsApp {
     private void printCommandList() {
         System.out.println("=============================================");
         System.out.println("What stat do you want to see?");
-        System.out.println("Total trophy gain? -> enter \"trophy\"");
+        System.out.println("Past x matches? -> enter \"previous\"");
         System.out.println("Total games with a character? -> enter \"character\"");
         System.out.println("Star player percentage? -> enter \"star\"");
         System.out.println("=============================================");
@@ -234,9 +238,14 @@ public class MatchStatsApp {
 
     // EFFECTS: prints out the past matches
     private void displayHistory() {
-        for (MatchLog logs : log.getList()) {
-            System.out.println(logs.logToString());
-            System.out.println();
+        int startNum = Integer.max(0,log.getSize() - 25);
+
+        try {
+            for (int i = startNum; i < log.getSize(); i++) {
+                System.out.println(log.getLog(i).logToString());
+            }
+        } catch (IndexOutOfBound e) {
+            System.out.println("An error has occurred");
         }
     }
 

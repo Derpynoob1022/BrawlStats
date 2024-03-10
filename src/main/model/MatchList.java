@@ -8,7 +8,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.Writable;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 // represents the list of MatchLogs
 public class MatchList implements Writable {
@@ -107,14 +110,55 @@ public class MatchList implements Writable {
         }
 
         return "Statistics for " + name + " "
-                + "[Kill Death Ratio: " + String.format("%.2f", killDeathRatioCalculator(name)) + " | "
-                + "Win rate: " + String.format("%.2f", winRateCalculator(name)) + "% | "
-                + "Average damage: " + averageDamageCalculator(name) + " | "
+                + "[Kill Death Ratio: " + String.format("%.2f", killDeathRatioCalculator(name, list)) + " | "
+                + "Win rate: " + String.format("%.2f", winRateCalculator(name, list)) + "% | "
+                + "Average damage: " + averageDamageCalculator(name, list) + " | "
                 + "Number of matches played: " + numberEntries + "]";
     }
 
+    // EFFECTS: produces statistics for the n few matches
+    public ArrayList<String> characterStatLastFew(int numOfPastGames) throws IndexOutOfBound {
+        ArrayList<String> result = new ArrayList<>();
+
+        int startNum = list.size() - numOfPastGames;
+
+        if (startNum < 0) {
+            throw new IndexOutOfBound();
+        }
+
+        Map<String, ArrayList<MatchLog>> matchMap = new HashMap<>();
+
+        for (int i = startNum; i < list.size(); i++) {
+            MatchLog currMatch = list.get(i);
+            if (!matchMap.containsKey(list.get(i).getCharacterName())) {
+                ArrayList<MatchLog> matches = new ArrayList<>();
+                matches.add(currMatch);
+                matchMap.put(currMatch.getCharacterName(), matches);
+            } else {
+                ArrayList<MatchLog> matches = matchMap.get(currMatch.getCharacterName());
+                matches.add(currMatch);
+            }
+        }
+
+        for (String s : matchMap.keySet()) {
+            ArrayList<MatchLog> currMatchList = matchMap.get(s);
+
+            result.add(toString(s, currMatchList));
+        }
+        return result;
+    }
+
+    // EFFECTS: convert the character stats to a string
+    public String toString(String key, ArrayList<MatchLog> currMatchList) {
+        return "Statistics for " + key + " "
+                + "[Kill Death Ratio: " + String.format("%.2f", killDeathRatioCalculator(key, currMatchList)) + " | "
+                + "Win rate: " + String.format("%.2f", winRateCalculator(key, currMatchList)) + "% | "
+                + "Average damage: " + averageDamageCalculator(key, currMatchList) + " | "
+                + "Number of matches played: " + currMatchList.size() + "]";
+    }
+
     // EFFECTS: calculates the win rate for a certain character name
-    public float winRateCalculator(String name) {
+    public float winRateCalculator(String name, ArrayList<MatchLog> list) {
         float numberWins = 0;
         float totalGames = 0;
 
@@ -130,7 +174,7 @@ public class MatchList implements Writable {
     }
 
     // EFFECTS: calculates the total kill death ratio of a certain character
-    public float killDeathRatioCalculator(String name) {
+    public float killDeathRatioCalculator(String name, ArrayList<MatchLog> list) {
         int totalKills = 0;
         int totalDeaths = 0;
 
@@ -149,7 +193,7 @@ public class MatchList implements Writable {
     }
 
     // EFFECTS: calculates the average damage for a certain character name
-    public int averageDamageCalculator(String name) {
+    public int averageDamageCalculator(String name, ArrayList<MatchLog> list) {
         int numMatches = 0;
         int totalDamage = 0;
 
