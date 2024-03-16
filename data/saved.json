@@ -343,14 +343,6 @@
             "name": "test1",
             "deltaTrophy": 4,
             "deaths": 2
-        },
-        {
-            "kills": 123,
-            "isMvp": true,
-            "damage": 443,
-            "name": "312",
-            "deltaTrophy": 6969696,
-            "deaths": 231
         }
     ],
     "user": "Neo's matches"

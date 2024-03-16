@@ -150,7 +150,7 @@ public class MatchList implements Writable {
 
     // EFFECTS: convert the character stats to a string
     public String toString(String key, ArrayList<MatchLog> currMatchList) {
-        return "Statistics for " + key + " "
+        return  key + ": "
                 + "[Kill Death Ratio: " + String.format("%.2f", killDeathRatioCalculator(key, currMatchList)) + " | "
                 + "Win rate: " + String.format("%.2f", winRateCalculator(key, currMatchList)) + "% | "
                 + "Average damage: " + averageDamageCalculator(key, currMatchList) + " | "

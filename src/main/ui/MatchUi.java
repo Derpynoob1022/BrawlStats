@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 class MatchUi extends JFrame {
     private static final int WIDTH = 800;
@@ -39,6 +40,9 @@ class MatchUi extends JFrame {
     private JLabel selected;
     private int selectedId;
     private JComboBox<String> comboBox;
+    private JTextField numLogs;
+    private ArrayList<String> stats;
+    private Boolean dataSaved;
 
     public MatchUi() {
         super();
@@ -50,6 +54,27 @@ class MatchUi extends JFrame {
         setTitle("BrawlStats");
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        dataSaved = true;
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // Check if data has been saved
+                if (!dataSaved) {
+                    int choice = JOptionPane.showConfirmDialog(MatchUi.this,
+                            "You have unsaved data. Do you want to save before closing?",
+                            "Save Reminder", JOptionPane.YES_NO_OPTION);
+                    if (choice == JOptionPane.YES_OPTION) {
+                        // Save data here
+                        saveMatches();
+                        // Close the window after saving
+                        dispose();
+                    }
+                } else {
+                    // Close the window if data is already saved
+                    dispose();
+                }
+            }
+        });
         setResizable(false);
 
         mainPanel = new JPanel();
@@ -64,7 +89,7 @@ class MatchUi extends JFrame {
         mainPanel.add(mainScreen, "MainScreen");
         mainPanel.add(addLogScreen, "AddLogScreen");
         mainPanel.add(editScreen, "EditScreen");
-        // mainPanel.add(statScreen, "StatScreen");
+        mainPanel.add(statScreen, "StatScreen");
 
         add(mainPanel);
         pack();
@@ -346,8 +371,87 @@ class MatchUi extends JFrame {
     }
 
     private JPanel createStatScreen() {
+        JPanel statPanel = new JPanel();
+        statPanel.setLayout(new BorderLayout());
+        statPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10),
+                BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Statistics")));
+        statPanel.setBackground(beige);
 
-        return null;
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridBagLayout());
+        inputPanel.setBackground(beige);
+
+        GridBagConstraints gbcTop = new GridBagConstraints();
+        gbcTop.gridx = 0;
+        gbcTop.gridy = 0;
+        gbcTop.insets = new Insets(5, 10, 5, 10);
+        gbcTop.anchor = GridBagConstraints.WEST;
+
+        JLabel instructionLabel = new JLabel("How many past logs do you want to view: ");
+        inputPanel.add(instructionLabel, gbcTop);
+        gbcTop.gridx++;
+
+        numLogs = createPlaceholderTextField("1 - " + (log.getSize() - 1));
+        numLogs.setPreferredSize(new Dimension(200, 30));
+
+        inputPanel.add(numLogs);
+
+        statPanel.add(inputPanel, BorderLayout.NORTH);
+
+        GridBagConstraints gbcCenter = new GridBagConstraints();
+        gbcCenter.gridx = 0;
+        gbcCenter.gridy = 0;
+        gbcCenter.insets = new Insets(5, 10, 5, 10);
+        gbcCenter.anchor = GridBagConstraints.WEST;
+
+        JPanel logsPanel = new JPanel();
+        logsPanel.setLayout(new GridBagLayout());
+        logsPanel.setBackground(beige);
+
+        if (stats != null) {
+            for (String s : stats) {
+                JLabel id = new JLabel(s);
+                id.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
+                logsPanel.add(id, gbcCenter);
+                gbcCenter.gridy++;
+            }
+        } else {
+            try {
+                for (String s : log.characterStatLastFew(log.getSize())) {
+                    JLabel id = new JLabel(s);
+                    id.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
+                    logsPanel.add(id, gbcCenter);
+                    gbcCenter.gridy++;
+                }
+            } catch (IndexOutOfBound g) {
+                System.out.println("Error has occurred when loading statistics");
+            }
+        }
+
+        JScrollPane scrollPane = new JScrollPane(logsPanel);
+        scrollPane.setPreferredSize(new Dimension(WIDTH - 100, 600));
+
+        statPanel.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbcBot = new GridBagConstraints();
+        gbcBot.gridx = 0;
+        gbcBot.gridy = 0;
+        gbcBot.insets = new Insets(0, 50, 10, 50);
+        gbcBot.anchor = GridBagConstraints.CENTER;
+
+        JButton confirmRefreshButton = makeButton("Refresh", refreshStat());
+        buttonPanel.add(confirmRefreshButton, gbcBot);
+        gbcBot.gridx++;
+        JButton goBackButton = makeButton("Back", goBack());
+        buttonPanel.add(goBackButton, gbcBot);
+        buttonPanel.setBackground(beige);
+
+        statPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        return statPanel;
     }
 
 
@@ -362,15 +466,33 @@ class MatchUi extends JFrame {
                     int death = Integer.parseInt(deathField.getText());
                     Boolean mvp = mvpField.isSelected();
                     int deltaTrophy = Integer.parseInt(deltaTrophyField.getText());
-                    deltaTrophyField.getText();
                     log.addLog(new MatchLog(name, damage, kill, death, mvp, deltaTrophy));
                     mainPanel.remove(mainScreen);
                     updateMainScreen();
                     resetInput();
                     mainPanel.add(mainScreen, "MainScreen");
                     cards.show(mainPanel, "MainScreen");
+                    dataSaved = false;
                 } catch (Exception g) {
                     JOptionPane.showMessageDialog(MatchUi.this, "Couldn't add log");
+                }
+            }
+        };
+    }
+
+    private ActionListener refreshStat() {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String numberLogs = numLogs.getText();
+                    stats = log.characterStatLastFew(Integer.parseInt(numberLogs));
+                    mainPanel.remove(statScreen);
+                    statScreen = createStatScreen();
+                    mainPanel.add(statScreen, "StatScreen");
+                    cards.show(mainPanel, "StatScreen");
+                } catch (IndexOutOfBound | NumberFormatException g) {
+                    JOptionPane.showMessageDialog(MatchUi.this, "Couldn't view statistics");
                 }
             }
         };
@@ -388,6 +510,7 @@ class MatchUi extends JFrame {
                     updateMainScreen();
                     mainPanel.add(mainScreen, "MainScreen");
                     cards.show(mainPanel, "MainScreen");
+                    dataSaved = false;
                 } catch (IndexOutOfBound | NoMatchingFields | NumberFormatException g) {
                     JOptionPane.showMessageDialog(MatchUi.this, "Couldn't edit log");
                 }
@@ -490,6 +613,7 @@ class MatchUi extends JFrame {
                 resetInput();
                 mainPanel.add(mainScreen, "MainScreen");
                 cards.show(mainPanel, "MainScreen");
+                dataSaved = false;
             }
         };
     }
