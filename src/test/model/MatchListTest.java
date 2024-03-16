@@ -231,7 +231,7 @@ public class MatchListTest {
             fail("testLog(s) is invalid");
         }
 
-        assertEquals("-27", testList.totalTrophyGain());
+        assertEquals("-27", testList.totalTrophyGain(testList.getList()));
     }
 
     @Test
@@ -247,7 +247,7 @@ public class MatchListTest {
             fail("testLog(s) is invalid");
         }
 
-        assertEquals("+125", testList.totalTrophyGain());
+        assertEquals("+125", testList.totalTrophyGain(testList.getList()));
     }
 
     @Test

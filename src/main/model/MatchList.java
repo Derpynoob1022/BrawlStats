@@ -73,7 +73,7 @@ public class MatchList implements Writable {
     }
 
     // EFFECTS: produces the total amount of trophies gained or lost
-    public String totalTrophyGain() {
+    public String totalTrophyGain(ArrayList<MatchLog> list) {
         int total = 0;
         for (MatchLog logs : list) {
             total = total + logs.getDeltaTrophy();
@@ -154,7 +154,8 @@ public class MatchList implements Writable {
                 + "[Kill Death Ratio: " + String.format("%.2f", killDeathRatioCalculator(key, currMatchList)) + " | "
                 + "Win rate: " + String.format("%.2f", winRateCalculator(key, currMatchList)) + "% | "
                 + "Average damage: " + averageDamageCalculator(key, currMatchList) + " | "
-                + "Number of matches played: " + currMatchList.size() + "]";
+                + "Number of matches played: " + currMatchList.size() + " | " + "Delta trophy: "
+                + totalTrophyGain(currMatchList) + "]";
     }
 
     // EFFECTS: calculates the win rate for a certain character name
