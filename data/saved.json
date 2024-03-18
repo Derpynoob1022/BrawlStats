@@ -290,58 +290,10 @@
         },
         {
             "kills": 4,
-            "isMvp": false,
-            "damage": 49359,
+            "isMvp": true,
+            "damage": 49350,
             "name": "Pam",
             "deltaTrophy": 8,
-            "deaths": 2
-        },
-        {
-            "kills": 7,
-            "isMvp": false,
-            "damage": 57182,
-            "name": "Angelo",
-            "deltaTrophy": 0,
-            "deaths": 5
-        },
-        {
-            "kills": 123,
-            "isMvp": true,
-            "damage": 123,
-            "name": "Jerry",
-            "deltaTrophy": 123,
-            "deaths": 123
-        },
-        {
-            "kills": 123,
-            "isMvp": true,
-            "damage": 4141414,
-            "name": "Jerry",
-            "deltaTrophy": 213321213,
-            "deaths": 41414
-        },
-        {
-            "kills": 213,
-            "isMvp": true,
-            "damage": 132,
-            "name": "321",
-            "deltaTrophy": 231,
-            "deaths": 312
-        },
-        {
-            "kills": 213,
-            "isMvp": true,
-            "damage": 132,
-            "name": "321",
-            "deltaTrophy": 231,
-            "deaths": 312
-        },
-        {
-            "kills": 1,
-            "isMvp": true,
-            "damage": 3,
-            "name": "test1",
-            "deltaTrophy": 4,
             "deaths": 2
         }
     ],

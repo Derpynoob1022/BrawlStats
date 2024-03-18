@@ -9,13 +9,17 @@ import persistence.JsonReader;
 import persistence.JsonWriter;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// TODO: add specification as well as abstract the data so each method doesn't take up more than 25 lines
 class MatchUi extends JFrame {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 700;
@@ -49,34 +53,22 @@ class MatchUi extends JFrame {
         jsonWriter = new JsonWriter(JSON_DESTINATION);
         jsonReader = new JsonReader(JSON_DESTINATION);
         log = new MatchList("Neo's matches");
-        loadMatches();
 
-        setTitle("BrawlStats");
+        setTitle("Brawl Stats");
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        pack();
+        centreOnScreen();
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         dataSaved = true;
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                // Check if data has been saved
-                if (!dataSaved) {
-                    int choice = JOptionPane.showConfirmDialog(MatchUi.this,
-                            "You have unsaved data. Do you want to save before closing?",
-                            "Save Reminder", JOptionPane.YES_NO_OPTION);
-                    if (choice == JOptionPane.YES_OPTION) {
-                        // Save data here
-                        saveMatches();
-                        // Close the window after saving
-                        dispose();
-                    }
-                } else {
-                    // Close the window if data is already saved
-                    dispose();
-                }
-            }
-        });
-        setResizable(false);
 
+        addWindowListener(createWindowListener());
+
+        setResizable(false);
+        add(initCards());
+        setVisible(true);
+    }
+
+    private JPanel initCards() {
         mainPanel = new JPanel();
         cards = new CardLayout();
         mainPanel.setLayout(cards);
@@ -91,10 +83,32 @@ class MatchUi extends JFrame {
         mainPanel.add(editScreen, "EditScreen");
         mainPanel.add(statScreen, "StatScreen");
 
-        add(mainPanel);
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
+        return mainPanel;
+    }
+
+    private WindowListener createWindowListener() {
+        return new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (!dataSaved) {
+                    int choice = JOptionPane.showConfirmDialog(MatchUi.this,
+                            "You have unsaved data. Do you want to save before closing?",
+                            "Save Reminder", JOptionPane.YES_NO_OPTION);
+                    if (choice == JOptionPane.YES_OPTION) {
+                        saveMatches();
+                        dispose();
+                    }
+                } else {
+                    dispose();
+                }
+            }
+        };
+    }
+
+    private void centreOnScreen() {
+        int width = Toolkit.getDefaultToolkit().getScreenSize().width;
+        int height = Toolkit.getDefaultToolkit().getScreenSize().height;
+        setLocation((width - getWidth()) / 2, (height - getHeight()) / 2);
     }
 
     private void saveMatches() {
@@ -125,12 +139,22 @@ class MatchUi extends JFrame {
         return button;
     }
 
-
     private void updateMainScreen() {
         JPanel mainScreenPanel = new JPanel();
         mainScreenPanel.setLayout(new BorderLayout());
 
+        JScrollPane scrollPane = new JScrollPane(initLogPanel());
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setPreferredSize(new Dimension(WIDTH - 100, 510));
 
+        mainScreenPanel.add(scrollPane, BorderLayout.NORTH);
+
+        createMainPanelButtons(mainScreenPanel);
+
+        mainScreen = mainScreenPanel;
+    }
+
+    private JPanel initLogPanel() {
         JPanel logsPanel = new JPanel();
         logsPanel.setLayout(new GridBagLayout());
         logsPanel.setBackground(beige);
@@ -145,21 +169,9 @@ class MatchUi extends JFrame {
         try {
             for (int i = log.getSize() - 1; i >= startNum; i--) {
                 JLabel id = new JLabel(log.getLog(i).logToString());
-                id.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
+                id.setBorder(createStatBorder());
                 id.putClientProperty("index", i);
-                id.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        // Perform actions when the label is clicked (selected)
-                        int index = (int) id.getClientProperty("index");
-                        if (selected != null) {
-                            selected.setForeground(Color.BLACK);
-                        }
-                        selected = id;
-                        selectedId = index;
-                        id.setForeground(Color.BLUE); // Change text color
-                    }
-                });
+                id.addMouseListener(createLogMouseListener(id, i));
                 logsPanel.add(id, gbcTop);
                 gbcTop.gridy++;
             }
@@ -167,22 +179,36 @@ class MatchUi extends JFrame {
             System.out.println("An error has occurred");
         }
 
-        JScrollPane scrollPane = new JScrollPane(logsPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setPreferredSize(new Dimension(WIDTH - 100, 510));
+        return logsPanel;
+    }
 
-        mainScreenPanel.add(scrollPane, BorderLayout.NORTH);
-
-        createMainPanelButtons(mainScreenPanel);
-
-        mainScreen = mainScreenPanel;
+    private MouseListener createLogMouseListener(final JLabel label, final int index) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (selected != null) {
+                    selected.setForeground(Color.BLACK);
+                }
+                selected = label;
+                selectedId = index;
+                label.setForeground(Color.BLUE);
+            }
+        };
     }
 
     private void createMainPanelButtons(JPanel panel) {
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new GridLayout(6, 1));
-        setVisible(true);
+        JPanel buttons = createButtonsPanel();
+        addButtons(buttons);
+        panel.add(buttons, BorderLayout.SOUTH);
+    }
 
+    private JPanel createButtonsPanel() {
+        JPanel buttons = new JPanel(new GridLayout(6, 1));
+        buttons.setVisible(true);
+        return buttons;
+    }
+
+    private void addButtons(JPanel buttons) {
         GridBagConstraints gbcButtons = new GridBagConstraints();
         gbcButtons.gridx = 0;
         gbcButtons.gridy = 0;
@@ -191,63 +217,83 @@ class MatchUi extends JFrame {
         gbcButtons.fill = GridBagConstraints.HORIZONTAL;
         gbcButtons.insets = new Insets(0, 10, 0, 10);
 
-        JButton button1 = makeButton("Add log", createAddLogAction());
-        buttons.add(button1, gbcButtons);
-        gbcButtons.gridy++;
-
-        JButton button2 = makeButton("Remove log", createRemoveLogAction());
-        buttons.add(button2,gbcButtons);
-        gbcButtons.gridy++;
-
-        JButton button3 = makeButton("Edit log", createEditLogAction());
-        buttons.add(button3,gbcButtons);
-        gbcButtons.gridy++;
-
-        JButton button4 = makeButton("View stats", createViewStatsAction());
-        buttons.add(button4,gbcButtons);
-        gbcButtons.gridy++;
-
-        JButton button5 = makeButton("Save", createSaveMatchesAction());
-        buttons.add(button5, gbcButtons);
-        gbcButtons.gridy++;
-
-        JButton button6 = makeButton("Load", createLoadMatchesAction());
-        buttons.add(button6, gbcButtons);
-        gbcButtons.gridy++;
+        addButton(buttons, "Add log", createAddLogAction(), gbcButtons);
+        addButton(buttons, "Remove log", createRemoveLogAction(), gbcButtons);
+        addButton(buttons, "Edit log", createEditLogAction(), gbcButtons);
+        addButton(buttons, "View stats", createViewStatsAction(), gbcButtons);
+        addButton(buttons, "Save", createSaveMatchesAction(), gbcButtons);
+        addButton(buttons, "Load", createLoadMatchesAction(), gbcButtons);
 
         gbcButtons.anchor = GridBagConstraints.SOUTH;
+    }
 
-        panel.add(buttons, BorderLayout.SOUTH);
+    private void addButton(JPanel panel, String buttonText, ActionListener actionListener, GridBagConstraints gbc) {
+        JButton button = makeButton(buttonText, actionListener);
+        panel.add(button, gbc);
+        gbc.gridy++;
     }
 
     private JPanel createAddLogScreen() {
         JPanel addLogPanel = new JPanel();
-        addLogPanel.setLayout(new GridBagLayout());
+        addLogPanel.setLayout(new BorderLayout());
         addLogPanel.setBackground(beige);
 
+        addLogPanel.add(createTextPanel(), BorderLayout.CENTER);
+
+        addLogPanel.setBorder(createCompoundBorder("Add log"));
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbcBot = new GridBagConstraints();
+        gbcBot.gridx = 0;
+        gbcBot.gridy = 7;
+        gbcBot.insets = new Insets(0, 50, 80, 50);
+        gbcBot.anchor = GridBagConstraints.CENTER;
+
+        JButton confirmAddLogButton = makeButton("Add log", finishAddLog());
+        buttonPanel.add(confirmAddLogButton, gbcBot);
+        gbcBot.gridx++;
+        JButton goBackButton = makeButton("Back", goBack());
+        buttonPanel.add(goBackButton, gbcBot);
+        buttonPanel.setBackground(beige);
+
+        addLogPanel.add(buttonPanel, BorderLayout.SOUTH);
+        return addLogPanel;
+    }
+
+    private JPanel createTextPanel() {
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new GridBagLayout());
         textPanel.setBackground(beige);
 
-        GridBagConstraints gbcTop = new GridBagConstraints();
-        gbcTop.gridx = 0;
-        gbcTop.gridy = 0;
-        gbcTop.insets = new Insets(20, 10, 20, 10);
-        gbcTop.anchor = GridBagConstraints.WEST;
-
-        textPanel.add(new JLabel("Character Name: "), gbcTop);
-        gbcTop.gridy++;
-        textPanel.add(new JLabel("Damage: "), gbcTop);
-        gbcTop.gridy++;
-        textPanel.add(new JLabel("Kills: "), gbcTop);
-        gbcTop.gridy++;
-        textPanel.add(new JLabel("Deaths: "), gbcTop);
-        gbcTop.gridy++;
-        textPanel.add(new JLabel("Star player: "), gbcTop);
-        gbcTop.gridy++;
-        textPanel.add(new JLabel("Delta trophy: "), gbcTop);
+        GridBagConstraints gbcTop = createGBC();
+        addLabels(textPanel, gbcTop);
         gbcTop.gridx++;
+        addFields(textPanel, gbcTop);
 
+        return textPanel;
+    }
+
+    private GridBagConstraints createGBC() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(20, 10, 20, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        return gbc;
+    }
+
+    private void addLabels(JPanel textPanel, GridBagConstraints gbcTop) {
+        String[] labelNames = {"Character Name:", "Damage:", "Kills:", "Deaths:", "Star player:", "Delta trophy:"};
+        for (String labelName : labelNames) {
+            JLabel label = new JLabel(labelName);
+            textPanel.add(label, gbcTop);
+            gbcTop.gridy++;
+        }
+    }
+
+    private void addFields(JPanel textPanel, GridBagConstraints gbcTop) {
         gbcTop.gridy = 0;
         gbcTop.weightx = 1;
         gbcTop.fill = GridBagConstraints.HORIZONTAL;
@@ -271,61 +317,41 @@ class MatchUi extends JFrame {
         textPanel.add(mvpField, gbcTop);
         gbcTop.gridy++;
         textPanel.add(deltaTrophyField, gbcTop);
+    }
 
-        addLogPanel.add(textPanel, gbcTop);
+    private CompoundBorder createCompoundBorder(String s) {
+        Border borderLine = BorderFactory.createLineBorder(Color.black);
+        EmptyBorder emptyBorder = new EmptyBorder(10, 10, 10, 10);
+        TitledBorder tiltedBorder = BorderFactory.createTitledBorder(borderLine, s);
 
-        addLogPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10),
-                BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Add Log")));
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbcBot = new GridBagConstraints();
-        gbcBot.gridx = 0;
-        gbcBot.gridy = 7;
-        gbcBot.insets = new Insets(0, 50, 10, 50);
-        gbcBot.anchor = GridBagConstraints.CENTER;
-
-        JButton confirmAddLogButton = makeButton("Add log", finishAddLog());
-        buttonPanel.add(confirmAddLogButton, gbcBot);
-        gbcBot.gridx++;
-        JButton goBackButton = makeButton("Back", goBack());
-        buttonPanel.add(goBackButton, gbcBot);
-        buttonPanel.setBackground(beige);
-
-        addLogPanel.add(buttonPanel, gbcBot);
-        return addLogPanel;
+        return BorderFactory.createCompoundBorder(emptyBorder, tiltedBorder);
     }
 
     private JPanel createEditScreen() {
         JPanel editLogPanel = new JPanel();
         editLogPanel.setLayout(new BorderLayout());
-        editLogPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10),
-                BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Edit Log")));
+        editLogPanel.setBorder(createCompoundBorder("Edit Log"));
         editLogPanel.setBackground(beige);
 
-        JLabel selectedLog = null;
+        JLabel selectedLog;
         try {
             selectedLog = new JLabel("Selected log: " + log.getLog(selectedId).logToString());
+            editLogPanel.add(selectedLog, BorderLayout.NORTH);
         } catch (IndexOutOfBound g) {
-            System.out.println("Error");
+            System.out.println("No Matches");
         }
 
-        editLogPanel.add(selectedLog, BorderLayout.NORTH);
+        editLogPanel.add(createComboBoxPanel(), BorderLayout.CENTER);
 
-        // Create a list of items for the dropdown
-        String[] items = {"Name", "Damage", "Kill", "Death", "Mvp", "Delta Trophy"};
+        editLogPanel.add(createEditButtonPanel(), BorderLayout.SOUTH);
 
-        // Create the JComboBox with the list of items
+        return editLogPanel;
+    }
+
+    private JPanel createComboBoxPanel() {
+        String[] items = {"Name", "Damage", "Kills", "Deaths", "Mvp", "Trophy"};
+
         comboBox = new JComboBox<>(items);
-
-        // Add an ActionListener to the JComboBox
-        comboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Get the selected item
-                String selectedOption = (String) comboBox.getSelectedItem();
-            }
-        });
 
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new GridBagLayout());
@@ -347,8 +373,10 @@ class MatchUi extends JFrame {
 
         textPanel.add(replaceField, gbcTop);
 
-        editLogPanel.add(textPanel, BorderLayout.CENTER);
+        return textPanel;
+    }
 
+    private JPanel createEditButtonPanel() {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
 
@@ -365,73 +393,18 @@ class MatchUi extends JFrame {
         buttonPanel.add(goBackButton, gbcBot);
         buttonPanel.setBackground(beige);
 
-        editLogPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        return editLogPanel;
+        return buttonPanel;
     }
 
     private JPanel createStatScreen() {
         JPanel statPanel = new JPanel();
         statPanel.setLayout(new BorderLayout());
-        statPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10),
-                BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Statistics")));
+        statPanel.setBorder(createCompoundBorder("Statistics"));
         statPanel.setBackground(beige);
 
-        JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new GridBagLayout());
-        inputPanel.setBackground(beige);
+        statPanel.add(createInputPanel(), BorderLayout.NORTH);
 
-        GridBagConstraints gbcTop = new GridBagConstraints();
-        gbcTop.gridx = 0;
-        gbcTop.gridy = 0;
-        gbcTop.insets = new Insets(5, 10, 5, 10);
-        gbcTop.anchor = GridBagConstraints.WEST;
-
-        JLabel instructionLabel = new JLabel("How many past logs do you want to view: ");
-        inputPanel.add(instructionLabel, gbcTop);
-        gbcTop.gridx++;
-
-        numLogs = createPlaceholderTextField("1 - " + (log.getSize() - 1));
-        numLogs.setPreferredSize(new Dimension(200, 30));
-
-        inputPanel.add(numLogs);
-
-        statPanel.add(inputPanel, BorderLayout.NORTH);
-
-        GridBagConstraints gbcCenter = new GridBagConstraints();
-        gbcCenter.gridx = 0;
-        gbcCenter.gridy = 0;
-        gbcCenter.insets = new Insets(5, 10, 5, 10);
-        gbcCenter.anchor = GridBagConstraints.WEST;
-
-        JPanel logsPanel = new JPanel();
-        logsPanel.setLayout(new GridBagLayout());
-        logsPanel.setBackground(beige);
-
-        if (stats != null) {
-            for (String s : stats) {
-                JLabel id = new JLabel(s);
-                id.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
-                logsPanel.add(id, gbcCenter);
-                gbcCenter.gridy++;
-            }
-        } else {
-            try {
-                for (String s : log.characterStatLastFew(log.getSize())) {
-                    JLabel id = new JLabel(s);
-                    id.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
-                    logsPanel.add(id, gbcCenter);
-                    gbcCenter.gridy++;
-                }
-            } catch (IndexOutOfBound g) {
-                System.out.println("Error has occurred when loading statistics");
-            }
-        }
-
-        JScrollPane scrollPane = new JScrollPane(logsPanel);
-        scrollPane.setPreferredSize(new Dimension(WIDTH - 100, 600));
-
-        statPanel.add(scrollPane, BorderLayout.CENTER);
+        statPanel.add(createLogStatsPanel(), BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
@@ -454,6 +427,70 @@ class MatchUi extends JFrame {
         return statPanel;
     }
 
+    private JPanel createInputPanel() {
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridBagLayout());
+        inputPanel.setBackground(beige);
+
+        GridBagConstraints gbcTop = new GridBagConstraints();
+        gbcTop.gridx = 0;
+        gbcTop.gridy = 0;
+        gbcTop.insets = new Insets(5, 10, 5, 10);
+        gbcTop.anchor = GridBagConstraints.WEST;
+
+        JLabel instructionLabel = new JLabel("How many past logs do you want to view: ");
+        inputPanel.add(instructionLabel, gbcTop);
+        gbcTop.gridx++;
+
+        numLogs = createPlaceholderTextField("1 - " + (log.getSize() - 1));
+        numLogs.setPreferredSize(new Dimension(200, 30));
+
+        inputPanel.add(numLogs);
+
+        return inputPanel;
+    }
+
+    private JScrollPane createLogStatsPanel() {
+        GridBagConstraints gbcCenter = createGBC();
+
+        JPanel logsPanel = new JPanel();
+        logsPanel.setLayout(new GridBagLayout());
+        logsPanel.setBackground(beige);
+
+        if (stats != null) {
+            for (String s : stats) {
+                logsPanel.add(createLabelWithBorder(s), gbcCenter);
+                gbcCenter.gridy++;
+            }
+        } else {
+            try {
+                for (String s : log.characterStatLastFew(log.getSize())) {
+                    logsPanel.add(createLabelWithBorder(s), gbcCenter);
+                    gbcCenter.gridy++;
+                }
+            } catch (IndexOutOfBound g) {
+                System.out.println("Error has occurred when loading statistics");
+            }
+        }
+
+        JScrollPane scrollPane = new JScrollPane(logsPanel);
+        scrollPane.setPreferredSize(new Dimension(WIDTH - 100, 600));
+
+        return scrollPane;
+    }
+
+    private JLabel createLabelWithBorder(String s) {
+        JLabel id = new JLabel(s);
+        id.setBorder(createStatBorder());
+        return id;
+    }
+
+    private CompoundBorder createStatBorder() {
+        Border raisedBorder = BorderFactory.createRaisedBevelBorder();
+        Border lowerBorder = BorderFactory.createLoweredBevelBorder();
+
+        return BorderFactory.createCompoundBorder(raisedBorder, lowerBorder);
+    }
 
     private ActionListener finishAddLog() {
         return new ActionListener() {
@@ -573,7 +610,6 @@ class MatchUi extends JFrame {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 cards.show(mainPanel, "AddLogScreen");
             }
         };
@@ -584,6 +620,7 @@ class MatchUi extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 saveMatches();
+                dataSaved = true;
             }
         };
     }
@@ -593,6 +630,10 @@ class MatchUi extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 loadMatches();
+                mainPanel.remove(mainScreen);
+                updateMainScreen();
+                mainPanel.add(mainScreen, "MainScreen");
+                cards.show(mainPanel, "MainScreen");
             }
         };
     }
@@ -638,6 +679,9 @@ class MatchUi extends JFrame {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                mainPanel.remove(statScreen);
+                statScreen = createStatScreen();
+                mainPanel.add(statScreen, "StatScreen");
                 cards.show(mainPanel, "StatScreen");
             }
         };

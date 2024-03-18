@@ -399,12 +399,14 @@ public class MatchListTest {
         }
 
         try {
-            assertEquals("Statistics for Will [Kill Death Ratio: 2.50 |" +
+            assertEquals("Will: [Kill Death Ratio: 2.50 |" +
                     " Win rate: 0.00% | Average damage: 2345878 |" +
-                    " Number of matches played: 1]",testList.characterStatLastFew(3).get(0));
-            assertEquals("Statistics for Jerry [Kill Death Ratio: 11.50 |" +
+                    " Number of matches played: 1 | Delta trophy: -32]",
+                    testList.characterStatLastFew(3).get(0));
+            assertEquals("Jerry: [Kill Death Ratio: 11.50 |" +
                     " Win rate: 50.00% | Average damage: 33728 |" +
-                    " Number of matches played: 2]",testList.characterStatLastFew(3).get(1));
+                    " Number of matches played: 2 | Delta trophy: +75]",
+                    testList.characterStatLastFew(3).get(1));
         } catch (IndexOutOfBound e) {
             fail("Shouldn't have thrown an exception");
         }
