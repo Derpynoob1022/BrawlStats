@@ -19,7 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-// TODO: add specification as well as abstract the data so each method doesn't take up more than 25 lines
+// the graphical user interface for the application
 class MatchUi extends JFrame {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 700;
@@ -47,7 +47,9 @@ class MatchUi extends JFrame {
     private JTextField numLogs;
     private ArrayList<String> stats;
     private Boolean dataSaved;
+    private Boolean overrideWarning;
 
+    // EFFECTS: constructor that creates a new window with buttons on the user's screen
     public MatchUi() {
         super();
         jsonWriter = new JsonWriter(JSON_DESTINATION);
@@ -60,6 +62,7 @@ class MatchUi extends JFrame {
         centreOnScreen();
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         dataSaved = true;
+        overrideWarning = false;
 
         addWindowListener(createWindowListener());
 
@@ -68,6 +71,8 @@ class MatchUi extends JFrame {
         setVisible(true);
     }
 
+    // MODIFIES: this
+    // EFFECTS: initiate the cards in the card-layout
     private JPanel initCards() {
         mainPanel = new JPanel();
         cards = new CardLayout();
@@ -86,6 +91,7 @@ class MatchUi extends JFrame {
         return mainPanel;
     }
 
+    // EFFECTS: creates a new window listener that opens a warning message when there is unsaved changes
     private WindowListener createWindowListener() {
         return new WindowAdapter() {
             @Override
@@ -105,12 +111,15 @@ class MatchUi extends JFrame {
         };
     }
 
+    // EFFECTS: centers the window in the middle of the screen
     private void centreOnScreen() {
         int width = Toolkit.getDefaultToolkit().getScreenSize().width;
         int height = Toolkit.getDefaultToolkit().getScreenSize().height;
         setLocation((width - getWidth()) / 2, (height - getHeight()) / 2);
     }
 
+    // MODIFIES: this
+    // EFFECTS: saves the current match list to the file at destination
     private void saveMatches() {
         try {
             jsonWriter.open();
@@ -123,7 +132,7 @@ class MatchUi extends JFrame {
     }
 
     // MODIFIES: this
-    // EFFECTS: loads the saved match list from file
+    // EFFECTS: loads the saved match list from the file at destination
     private void loadMatches() {
         try {
             log = jsonReader.read();
@@ -133,12 +142,15 @@ class MatchUi extends JFrame {
         }
     }
 
+    // EFFECTS: creates a JButton
     private static JButton makeButton(String text, ActionListener listener) {
         JButton button = new JButton(text);
         button.addActionListener(listener);
         return button;
     }
 
+    // MODIFIES: this
+    // EFFECTS: creates/updates the main screen with its various GUI components
     private void updateMainScreen() {
         JPanel mainScreenPanel = new JPanel();
         mainScreenPanel.setLayout(new BorderLayout());
@@ -154,6 +166,7 @@ class MatchUi extends JFrame {
         mainScreen = mainScreenPanel;
     }
 
+    // EFFECTS: creates the JPanel for the logs to be displayed
     private JPanel initLogPanel() {
         JPanel logsPanel = new JPanel();
         logsPanel.setLayout(new GridBagLayout());
@@ -182,6 +195,7 @@ class MatchUi extends JFrame {
         return logsPanel;
     }
 
+    // EFFECTS: creates a mouse listener for the Jlabel at a certain index
     private MouseListener createLogMouseListener(final JLabel label, final int index) {
         return new MouseAdapter() {
             @Override
@@ -196,18 +210,23 @@ class MatchUi extends JFrame {
         };
     }
 
+    // MODIFIES: this
+    // EFFECTS: adds the created button panel to the main panel
     private void createMainPanelButtons(JPanel panel) {
         JPanel buttons = createButtonsPanel();
         addButtons(buttons);
         panel.add(buttons, BorderLayout.SOUTH);
     }
 
+    // EFFECTS: creates the button panel with buttons inside
     private JPanel createButtonsPanel() {
         JPanel buttons = new JPanel(new GridLayout(6, 1));
         buttons.setVisible(true);
         return buttons;
     }
 
+    // MODIFIES: this
+    // EFFECTS: Adds buttons to the specified panel with the given constraints.
     private void addButtons(JPanel buttons) {
         GridBagConstraints gbcButtons = new GridBagConstraints();
         gbcButtons.gridx = 0;
@@ -227,12 +246,15 @@ class MatchUi extends JFrame {
         gbcButtons.anchor = GridBagConstraints.SOUTH;
     }
 
+    // MODIFIES: this
+    // EFFECTS: makes the button while adding to the gridbaglayout
     private void addButton(JPanel panel, String buttonText, ActionListener actionListener, GridBagConstraints gbc) {
         JButton button = makeButton(buttonText, actionListener);
         panel.add(button, gbc);
         gbc.gridy++;
     }
 
+    // EFFECTS: creates a new panel for the addLog card
     private JPanel createAddLogScreen() {
         JPanel addLogPanel = new JPanel();
         addLogPanel.setLayout(new BorderLayout());
@@ -262,12 +284,13 @@ class MatchUi extends JFrame {
         return addLogPanel;
     }
 
+    // EFFECTS: creates the text and input panel
     private JPanel createTextPanel() {
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new GridBagLayout());
         textPanel.setBackground(beige);
 
-        GridBagConstraints gbcTop = createGBC();
+        GridBagConstraints gbcTop = createGBC(20, 10, 20, 10);
         addLabels(textPanel, gbcTop);
         gbcTop.gridx++;
         addFields(textPanel, gbcTop);
@@ -275,24 +298,29 @@ class MatchUi extends JFrame {
         return textPanel;
     }
 
-    private GridBagConstraints createGBC() {
+    // EFFECTS: creates a new GridBagConstraints for the given numbers as the inserts
+    private GridBagConstraints createGBC(int top, int left, int bottom, int right) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(20, 10, 20, 10);
+        gbc.insets = new Insets(top, left, bottom, right);
         gbc.anchor = GridBagConstraints.WEST;
         return gbc;
     }
 
+    // MODIFIES: this
+    // EFFECTS: adds the labels to the panel
     private void addLabels(JPanel textPanel, GridBagConstraints gbcTop) {
-        String[] labelNames = {"Character Name:", "Damage:", "Kills:", "Deaths:", "Star player:", "Delta trophy:"};
-        for (String labelName : labelNames) {
+        String[] labels = {"Character Name: ", "Damage: ", "Kills: ", "Deaths: ", "Star player: ", "Delta trophy: "};
+        for (String labelName : labels) {
             JLabel label = new JLabel(labelName);
             textPanel.add(label, gbcTop);
             gbcTop.gridy++;
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: adds the text boxes to the panel
     private void addFields(JPanel textPanel, GridBagConstraints gbcTop) {
         gbcTop.gridy = 0;
         gbcTop.weightx = 1;
@@ -319,6 +347,7 @@ class MatchUi extends JFrame {
         textPanel.add(deltaTrophyField, gbcTop);
     }
 
+    // EFFECTS: creates a compound border with a title
     private CompoundBorder createCompoundBorder(String s) {
         Border borderLine = BorderFactory.createLineBorder(Color.black);
         EmptyBorder emptyBorder = new EmptyBorder(10, 10, 10, 10);
@@ -327,6 +356,7 @@ class MatchUi extends JFrame {
         return BorderFactory.createCompoundBorder(emptyBorder, tiltedBorder);
     }
 
+    // EFFECTS: creates a new panel for the editLog card
     private JPanel createEditScreen() {
         JPanel editLogPanel = new JPanel();
         editLogPanel.setLayout(new BorderLayout());
@@ -348,6 +378,7 @@ class MatchUi extends JFrame {
         return editLogPanel;
     }
 
+    // EFFECTS: creates a new dropdown box
     private JPanel createComboBoxPanel() {
         String[] items = {"Name", "Damage", "Kills", "Deaths", "Mvp", "Trophy"};
 
@@ -357,11 +388,7 @@ class MatchUi extends JFrame {
         textPanel.setLayout(new GridBagLayout());
         textPanel.setBackground(beige);
 
-        GridBagConstraints gbcTop = new GridBagConstraints();
-        gbcTop.gridx = 0;
-        gbcTop.gridy = 0;
-        gbcTop.insets = new Insets(20, 10, 20, 10);
-        gbcTop.anchor = GridBagConstraints.WEST;
+        GridBagConstraints gbcTop = createGBC(20, 10, 20, 10);
         gbcTop.fill = GridBagConstraints.HORIZONTAL;
 
         textPanel.add(comboBox, gbcTop);
@@ -376,15 +403,12 @@ class MatchUi extends JFrame {
         return textPanel;
     }
 
+    // EFFECTS: creates a new button panel for the editPanel
     private JPanel createEditButtonPanel() {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
 
-        GridBagConstraints gbcBot = new GridBagConstraints();
-        gbcBot.gridx = 0;
-        gbcBot.gridy = 0;
-        gbcBot.insets = new Insets(0, 50, 10, 50);
-        gbcBot.anchor = GridBagConstraints.CENTER;
+        GridBagConstraints gbcBot = createGBC(0, 50, 10, 50);
 
         JButton confirmAddLogButton = makeButton("Edit log", finishEditLog());
         buttonPanel.add(confirmAddLogButton, gbcBot);
@@ -396,6 +420,7 @@ class MatchUi extends JFrame {
         return buttonPanel;
     }
 
+    // EFFECTS: creates a panel for the statScreen card
     private JPanel createStatScreen() {
         JPanel statPanel = new JPanel();
         statPanel.setLayout(new BorderLayout());
@@ -409,11 +434,7 @@ class MatchUi extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
 
-        GridBagConstraints gbcBot = new GridBagConstraints();
-        gbcBot.gridx = 0;
-        gbcBot.gridy = 0;
-        gbcBot.insets = new Insets(0, 50, 10, 50);
-        gbcBot.anchor = GridBagConstraints.CENTER;
+        GridBagConstraints gbcBot = createGBC(0, 50, 10, 50);
 
         JButton confirmRefreshButton = makeButton("Refresh", refreshStat());
         buttonPanel.add(confirmRefreshButton, gbcBot);
@@ -427,16 +448,13 @@ class MatchUi extends JFrame {
         return statPanel;
     }
 
+    // EFFECTS: creates the text and input panel
     private JPanel createInputPanel() {
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new GridBagLayout());
         inputPanel.setBackground(beige);
 
-        GridBagConstraints gbcTop = new GridBagConstraints();
-        gbcTop.gridx = 0;
-        gbcTop.gridy = 0;
-        gbcTop.insets = new Insets(5, 10, 5, 10);
-        gbcTop.anchor = GridBagConstraints.WEST;
+        GridBagConstraints gbcTop = createGBC(5, 10, 5, 10);
 
         JLabel instructionLabel = new JLabel("How many past logs do you want to view: ");
         inputPanel.add(instructionLabel, gbcTop);
@@ -450,8 +468,9 @@ class MatchUi extends JFrame {
         return inputPanel;
     }
 
+    // EFFECTS: creates the scroll panel that includes all the statistic entries
     private JScrollPane createLogStatsPanel() {
-        GridBagConstraints gbcCenter = createGBC();
+        GridBagConstraints gbcCenter = createGBC(5, 10, 5, 10);
 
         JPanel logsPanel = new JPanel();
         logsPanel.setLayout(new GridBagLayout());
@@ -479,19 +498,24 @@ class MatchUi extends JFrame {
         return scrollPane;
     }
 
+    // EFFECTS: creates a label with the given string
     private JLabel createLabelWithBorder(String s) {
         JLabel id = new JLabel(s);
         id.setBorder(createStatBorder());
         return id;
     }
 
-    private CompoundBorder createStatBorder() {
+    // EFFECTS: creates a special border for statistics entries
+    private Border createStatBorder() {
         Border raisedBorder = BorderFactory.createRaisedBevelBorder();
         Border lowerBorder = BorderFactory.createLoweredBevelBorder();
 
         return BorderFactory.createCompoundBorder(raisedBorder, lowerBorder);
     }
 
+    // MODIFIES: this
+    // EFFECTS: takes the values from the addLogScreen and creates a new log. After that repaint the
+    // components to display the changes
     private ActionListener finishAddLog() {
         return new ActionListener() {
             @Override
@@ -510,6 +534,7 @@ class MatchUi extends JFrame {
                     mainPanel.add(mainScreen, "MainScreen");
                     cards.show(mainPanel, "MainScreen");
                     dataSaved = false;
+                    overrideWarning = true;
                 } catch (Exception g) {
                     JOptionPane.showMessageDialog(MatchUi.this, "Couldn't add log");
                 }
@@ -517,6 +542,8 @@ class MatchUi extends JFrame {
         };
     }
 
+    // MODIFIES: this
+    // EFFECTS: refreshes the display when user requests to view the stats for another set of logs
     private ActionListener refreshStat() {
         return new ActionListener() {
             @Override
@@ -535,6 +562,9 @@ class MatchUi extends JFrame {
         };
     }
 
+    // Modifies: this
+    // EFFECTS: takes the values from the editLogScreen and edits an existing log. After that repaint the
+    // components to display the changes
     private ActionListener finishEditLog() {
         return new ActionListener() {
             @Override
@@ -548,6 +578,7 @@ class MatchUi extends JFrame {
                     mainPanel.add(mainScreen, "MainScreen");
                     cards.show(mainPanel, "MainScreen");
                     dataSaved = false;
+                    overrideWarning = true;
                 } catch (IndexOutOfBound | NoMatchingFields | NumberFormatException g) {
                     JOptionPane.showMessageDialog(MatchUi.this, "Couldn't edit log");
                 }
@@ -555,6 +586,8 @@ class MatchUi extends JFrame {
         };
     }
 
+    // MODIFIES: this
+    // EFFECTS: reset all the previous inputs in the text boxes
     private void resetInput() {
         nameField.setText("String");
         damageField.setText("Integer");
@@ -570,33 +603,34 @@ class MatchUi extends JFrame {
         deltaTrophyField.setForeground(Color.GRAY);
     }
 
+    // EFFECTS: creates a text box where when nothing is inputted, it shows what belongs there
     private JTextField createPlaceholderTextField(String placeholder) {
         JTextField textField = new JTextField(placeholder);
         textField.setBackground(beige);
 
-        textField.setForeground(Color.GRAY); // Set text color to gray
+        textField.setForeground(Color.GRAY);
         textField.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
                 if (textField.getText().equals(placeholder)) {
-                    textField.setText(""); // Clear text only if it's the placeholder
-                    textField.setForeground(Color.BLACK); // Change text color to black
+                    textField.setText("");
+                    textField.setForeground(Color.BLACK);
                 }
             }
 
             @Override
             public void focusLost(FocusEvent e) {
                 if (textField.getText().isEmpty()) {
-                    textField.setText(placeholder); // Restore placeholder if field is empty
-                    textField.setForeground(Color.GRAY); // Change text color back to gray
+                    textField.setText(placeholder);
+                    textField.setForeground(Color.GRAY);
                 }
             }
         });
-
         return textField;
     }
 
-
+    // MODIFIES: this
+    // EFFECTS: goes back to the mainPanel
     private ActionListener goBack() {
         return new ActionListener() {
             @Override
@@ -606,6 +640,8 @@ class MatchUi extends JFrame {
         };
     }
 
+    // MODIFIES: this
+    // EFFECTS: switches to the addLogScreen
     private ActionListener createAddLogAction() {
         return new ActionListener() {
             @Override
@@ -615,6 +651,8 @@ class MatchUi extends JFrame {
         };
     }
 
+    // MODIFIES: this
+    // EFFECTS: saves the matches
     private ActionListener createSaveMatchesAction() {
         return new ActionListener() {
             @Override
@@ -625,19 +663,31 @@ class MatchUi extends JFrame {
         };
     }
 
+    // MODIFIES: this
+    // EFFECTS: loads in the matches from the JSON file. Displays a warning when data is overridden. Also refresh screen
     private ActionListener createLoadMatchesAction() {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loadMatches();
-                mainPanel.remove(mainScreen);
-                updateMainScreen();
-                mainPanel.add(mainScreen, "MainScreen");
-                cards.show(mainPanel, "MainScreen");
+                if (overrideWarning) {
+                    int choice = JOptionPane.showConfirmDialog(MatchUi.this,
+                            "Are you sure you want to Override existing data?",
+                            "Load Reminder", JOptionPane.YES_NO_OPTION);
+                    if (choice == JOptionPane.YES_OPTION) {
+                        dataSaved = true;
+                        loadMatches();
+                        mainPanel.remove(mainScreen);
+                        updateMainScreen();
+                        mainPanel.add(mainScreen, "MainScreen");
+                        cards.show(mainPanel, "MainScreen");
+                    }
+                }
             }
         };
     }
 
+    // MODIFIES: this
+    // EFFECTS: removes the selected log
     private ActionListener createRemoveLogAction() {
         return new ActionListener() {
             @Override
@@ -659,6 +709,8 @@ class MatchUi extends JFrame {
         };
     }
 
+    // MODIFIES: this
+    // EFFECTS: switches to the editLogScreen
     private ActionListener createEditLogAction() {
         return new ActionListener() {
             @Override
@@ -675,6 +727,8 @@ class MatchUi extends JFrame {
         };
     }
 
+    // MODIFIES: this
+    // EFFECTS: switches to the viewStatsScreen
     private ActionListener createViewStatsAction() {
         return new ActionListener() {
             @Override
@@ -686,7 +740,6 @@ class MatchUi extends JFrame {
             }
         };
     }
-
 
     public static void main(String[] args) {
         new MatchUi();
