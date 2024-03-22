@@ -8,6 +8,7 @@ import model.exception.NoMatchingFields;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -15,6 +16,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ class MatchUi extends JFrame {
     private CardLayout cards;
     private MatchList log;
     private static JPanel mainPanel;
+    private JPanel startScreen;
     private JPanel addLogScreen;
     private JPanel mainScreen;
     private JPanel editScreen;
@@ -78,11 +82,13 @@ class MatchUi extends JFrame {
         cards = new CardLayout();
         mainPanel.setLayout(cards);
 
+        startScreen = createStartScreen();
         updateMainScreen();
         editScreen = createEditScreen();
         addLogScreen = createAddLogScreen();
         statScreen =  createStatScreen();
 
+        mainPanel.add(startScreen, "StartScreen");
         mainPanel.add(mainScreen, "MainScreen");
         mainPanel.add(addLogScreen, "AddLogScreen");
         mainPanel.add(editScreen, "EditScreen");
@@ -150,6 +156,36 @@ class MatchUi extends JFrame {
     }
 
     // MODIFIES: this
+    // EFFECTS: creates the startup screen
+    public JPanel createStartScreen() {
+        try {
+            BufferedImage background = ImageIO.read(new File("./data/background.jpg"));
+            Image scaledBackground = background.getScaledInstance(2160, 1212, Image.SCALE_DEFAULT);
+            JPanel startScreen = new JPanel() {
+                @Override
+                public void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    g.drawImage(scaledBackground, 0, 0, null);
+                }
+            };
+            startScreen.setLayout(new BorderLayout());
+            BufferedImage myPicture = ImageIO.read(new File("./data/trophy.png"));
+            JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+            startScreen.add(picLabel, BorderLayout.CENTER);
+
+            JButton start = makeButton("Start", startApp());
+            start.setPreferredSize(new Dimension(600, 100));
+            startScreen.add(start, BorderLayout.SOUTH);
+            return startScreen;
+
+        } catch (IOException e) {
+            System.exit(0);
+        }
+        return null;
+    }
+
+
+    // MODIFIES: this
     // EFFECTS: creates/updates the main screen with its various GUI components
     private void updateMainScreen() {
         JPanel mainScreenPanel = new JPanel();
@@ -191,7 +227,6 @@ class MatchUi extends JFrame {
         } catch (IndexOutOfBound e) {
             System.out.println("An error has occurred");
         }
-
         return logsPanel;
     }
 
@@ -460,7 +495,8 @@ class MatchUi extends JFrame {
         inputPanel.add(instructionLabel, gbcTop);
         gbcTop.gridx++;
 
-        numLogs = createPlaceholderTextField("1 - " + (log.getSize() - 1));
+        String text = Integer.min(1, log.getSize()) + " - " + Integer.max(0, log.getSize());
+        numLogs = createPlaceholderTextField(text);
         numLogs.setPreferredSize(new Dimension(200, 30));
 
         inputPanel.add(numLogs);
@@ -514,6 +550,17 @@ class MatchUi extends JFrame {
     }
 
     // MODIFIES: this
+    // EFFECTS: adds a button that switches the screen to the MainScreen
+    private ActionListener startApp() {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cards.show(mainPanel, "MainScreen");
+            }
+        };
+    }
+
+    // MODIFIES: this
     // EFFECTS: takes the values from the addLogScreen and creates a new log. After that repaint the
     // components to display the changes
     private ActionListener finishAddLog() {
@@ -550,7 +597,7 @@ class MatchUi extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String numberLogs = numLogs.getText();
-                    stats = log.characterStatLastFew(Integer.parseInt(numberLogs));
+                    stats = log.characterStatLastFew(Math.min(log.getSize(), Integer.parseInt(numberLogs)));
                     mainPanel.remove(statScreen);
                     statScreen = createStatScreen();
                     mainPanel.add(statScreen, "StatScreen");
@@ -579,8 +626,10 @@ class MatchUi extends JFrame {
                     cards.show(mainPanel, "MainScreen");
                     dataSaved = false;
                     overrideWarning = true;
-                } catch (IndexOutOfBound | NoMatchingFields | NumberFormatException g) {
-                    JOptionPane.showMessageDialog(MatchUi.this, "Couldn't edit log");
+                } catch (IndexOutOfBound g) {
+                    JOptionPane.showMessageDialog(MatchUi.this, "Index out of bounds!");
+                } catch (NoMatchingFields | NumberFormatException h) {
+                    JOptionPane.showMessageDialog(MatchUi.this, "Invalid data entered!");
                 }
             }
         };
@@ -669,21 +718,28 @@ class MatchUi extends JFrame {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (overrideWarning) {
+                if (!overrideWarning) {
+                    executeLoadMatches();
+                } else {
                     int choice = JOptionPane.showConfirmDialog(MatchUi.this,
                             "Are you sure you want to Override existing data?",
                             "Load Reminder", JOptionPane.YES_NO_OPTION);
                     if (choice == JOptionPane.YES_OPTION) {
-                        dataSaved = true;
-                        loadMatches();
-                        mainPanel.remove(mainScreen);
-                        updateMainScreen();
-                        mainPanel.add(mainScreen, "MainScreen");
-                        cards.show(mainPanel, "MainScreen");
+                        executeLoadMatches();
                     }
                 }
             }
         };
+    }
+
+    // EFFECTS: execute and load the matches
+    private void executeLoadMatches() {
+        dataSaved = true;
+        loadMatches();
+        mainPanel.remove(mainScreen);
+        updateMainScreen();
+        mainPanel.add(mainScreen, "MainScreen");
+        cards.show(mainPanel, "MainScreen");
     }
 
     // MODIFIES: this

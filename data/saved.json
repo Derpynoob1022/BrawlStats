@@ -290,8 +290,8 @@
         },
         {
             "kills": 4,
-            "isMvp": true,
-            "damage": 49350,
+            "isMvp": false,
+            "damage": 49359,
             "name": "Pam",
             "deltaTrophy": 8,
             "deaths": 2
