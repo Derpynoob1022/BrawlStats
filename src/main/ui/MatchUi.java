@@ -207,18 +207,15 @@ class MatchUi extends JFrame {
         JPanel logsPanel = new JPanel();
         logsPanel.setLayout(new GridBagLayout());
         logsPanel.setBackground(beige);
-        GridBagConstraints gbcTop = new GridBagConstraints();
-        gbcTop.gridx = 0;
-        gbcTop.gridy = 0;
-        gbcTop.insets = new Insets(5, 10, 5, 10);
-        gbcTop.anchor = GridBagConstraints.WEST;
+        GridBagConstraints gbcTop = createGBC(5, 10, 5, 10);
 
         int startNum = Integer.max(0,log.getSize() - 30);
 
         try {
             for (int i = log.getSize() - 1; i >= startNum; i--) {
-                JLabel id = new JLabel(log.getLog(i).logToString());
-                id.setBorder(createStatBorder());
+                MatchLog l = log.getLog(i);
+                JLabel id = new JLabel(l.logToString());
+                id.setBorder(createColorBorder(evalColor(l)));
                 id.putClientProperty("index", i);
                 id.addMouseListener(createLogMouseListener(id, i));
                 logsPanel.add(id, gbcTop);
@@ -228,6 +225,17 @@ class MatchUi extends JFrame {
             System.out.println("An error has occurred");
         }
         return logsPanel;
+    }
+
+    // EFFECTS: evaluate which color the border of the log should be
+    public Color evalColor(MatchLog l) {
+        if (l.getDeltaTrophy() > 0) {
+            return Color.GREEN;
+        } else if (l.getDeltaTrophy() < 0) {
+            return Color.RED;
+        } else {
+            return Color.BLACK;
+        }
     }
 
     // EFFECTS: creates a mouse listener for the Jlabel at a certain index
@@ -297,7 +305,7 @@ class MatchUi extends JFrame {
 
         addLogPanel.add(createTextPanel(), BorderLayout.CENTER);
 
-        addLogPanel.setBorder(createCompoundBorder("Add log"));
+        addLogPanel.setBorder(createCompoundTitleBorder("Add log"));
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
@@ -383,7 +391,7 @@ class MatchUi extends JFrame {
     }
 
     // EFFECTS: creates a compound border with a title
-    private CompoundBorder createCompoundBorder(String s) {
+    private CompoundBorder createCompoundTitleBorder(String s) {
         Border borderLine = BorderFactory.createLineBorder(Color.black);
         EmptyBorder emptyBorder = new EmptyBorder(10, 10, 10, 10);
         TitledBorder tiltedBorder = BorderFactory.createTitledBorder(borderLine, s);
@@ -391,11 +399,16 @@ class MatchUi extends JFrame {
         return BorderFactory.createCompoundBorder(emptyBorder, tiltedBorder);
     }
 
+    // EFFECTS: creates a compound border with a title
+    private Border createColorBorder(Color color) {
+        return BorderFactory.createLineBorder(color);
+    }
+
     // EFFECTS: creates a new panel for the editLog card
     private JPanel createEditScreen() {
         JPanel editLogPanel = new JPanel();
         editLogPanel.setLayout(new BorderLayout());
-        editLogPanel.setBorder(createCompoundBorder("Edit Log"));
+        editLogPanel.setBorder(createCompoundTitleBorder("Edit Log"));
         editLogPanel.setBackground(beige);
 
         JLabel selectedLog;
@@ -459,7 +472,7 @@ class MatchUi extends JFrame {
     private JPanel createStatScreen() {
         JPanel statPanel = new JPanel();
         statPanel.setLayout(new BorderLayout());
-        statPanel.setBorder(createCompoundBorder("Statistics"));
+        statPanel.setBorder(createCompoundTitleBorder("Statistics"));
         statPanel.setBackground(beige);
 
         statPanel.add(createInputPanel(), BorderLayout.NORTH);
