@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.Writable;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +53,8 @@ public class MatchList implements Writable {
         if (i < 0 || i > (list.size() - 1)) {
             throw new IndexOutOfBound();
         } else {
+            EventLog.getInstance().logEvent(new Event(list.get(i).logToString() + " has been "
+                    + "removed from MatchList"));
             list.remove(i);
         }
     }
@@ -62,6 +63,7 @@ public class MatchList implements Writable {
     // EFFECTS: adds a single log entry to the list
     public void addLog(MatchLog m) throws IllegalValueException {
         this.list.add(m);
+        EventLog.getInstance().logEvent(new Event(m.logToString() + " has been added to the MatchList"));
     }
 
     // MODIFIES: this
@@ -69,7 +71,10 @@ public class MatchList implements Writable {
     public void editList(int index, String field, String rep) throws IndexOutOfBound, NoMatchingFields,
             NumberFormatException {
         MatchLog editedLog = list.get(index);
+        String previousLog = editedLog.logToString();
         editedLog.editLog(field, rep);
+        EventLog.getInstance().logEvent(new Event("Changed from \n" + previousLog + " to \n"
+                + editedLog.logToString()));
     }
 
     // EFFECTS: produces the total amount of trophies gained or lost
@@ -94,6 +99,7 @@ public class MatchList implements Writable {
         }
 
         return String.format("%.2f", 100 * starPlayerGames / totalGames) + "%";
+
     }
 
     // EFFECTS: produces statistics for a certain character

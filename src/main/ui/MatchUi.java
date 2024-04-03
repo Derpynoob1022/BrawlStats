@@ -1,5 +1,7 @@
 package ui;
 
+import model.EventLog;
+import model.Event;
 import model.MatchList;
 import model.MatchLog;
 import model.exception.IllegalValueException;
@@ -46,7 +48,7 @@ class MatchUi extends JFrame {
     private JsonWriter jsonWriter;   // writing the json file
     private JsonReader jsonReader;   // reading the json file
     private JLabel selected;
-    private int selectedId;
+    private int selectedId = -1;
     private JComboBox<String> comboBox;
     private JTextField numLogs;
     private ArrayList<String> stats;
@@ -113,6 +115,7 @@ class MatchUi extends JFrame {
                 } else {
                     dispose();
                 }
+                printLog();
             }
         };
     }
@@ -174,10 +177,9 @@ class MatchUi extends JFrame {
             startScreen.add(picLabel, BorderLayout.CENTER);
 
             JButton start = makeButton("Start", startApp());
-            start.setPreferredSize(new Dimension(600, 100));
+            start.setPreferredSize(new Dimension(200, 100));
             startScreen.add(start, BorderLayout.SOUTH);
             return startScreen;
-
         } catch (IOException e) {
             System.exit(0);
         }
@@ -209,20 +211,24 @@ class MatchUi extends JFrame {
         logsPanel.setBackground(beige);
         GridBagConstraints gbcTop = createGBC(5, 10, 5, 10);
 
-        int startNum = Integer.max(0,log.getSize() - 30);
+        int startNum = Integer.max(0, log.getSize() - 30);
 
-        try {
-            for (int i = log.getSize() - 1; i >= startNum; i--) {
-                MatchLog l = log.getLog(i);
-                JLabel id = new JLabel(l.logToString());
-                id.setBorder(createColorBorder(evalColor(l)));
-                id.putClientProperty("index", i);
-                id.addMouseListener(createLogMouseListener(id, i));
-                logsPanel.add(id, gbcTop);
-                gbcTop.gridy++;
+        if (log.getSize() == 0) {
+            return logsPanel;
+        } else {
+            try {
+                for (int i = log.getSize() - 1; i >= startNum; i--) {
+                    MatchLog l = log.getLog(i);
+                    JLabel id = new JLabel(l.logToString());
+                    id.setBorder(createColorBorder(evalColor(l)));
+                    id.putClientProperty("index", i);
+                    id.addMouseListener(createLogMouseListener(id, i));
+                    logsPanel.add(id, gbcTop);
+                    gbcTop.gridy++;
+                }
+            } catch (IndexOutOfBound e) {
+                System.out.println("An error has occurred");
             }
-        } catch (IndexOutOfBound e) {
-            System.out.println("An error has occurred");
         }
         return logsPanel;
     }
@@ -413,10 +419,14 @@ class MatchUi extends JFrame {
 
         JLabel selectedLog;
         try {
-            selectedLog = new JLabel("Selected log: " + log.getLog(selectedId).logToString());
+            if (selectedId == -1) {
+                selectedLog = new JLabel("Selected log: none");
+            } else {
+                selectedLog = new JLabel("Selected log: " + log.getLog(selectedId).logToString());
+            }
             editLogPanel.add(selectedLog, BorderLayout.NORTH);
         } catch (IndexOutOfBound g) {
-            System.out.println("No Matches");
+            System.out.println("An error has occured");
         }
 
         editLogPanel.add(createComboBoxPanel(), BorderLayout.CENTER);
@@ -808,6 +818,12 @@ class MatchUi extends JFrame {
                 cards.show(mainPanel, "StatScreen");
             }
         };
+    }
+
+    private void printLog() {
+        for (Event next : EventLog.getInstance()) {
+            System.out.println(next.toString() + "\n");
+        }
     }
 
     public static void main(String[] args) {

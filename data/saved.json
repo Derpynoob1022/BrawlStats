@@ -270,31 +270,15 @@
             "damage": 40642,
             "name": "El primo",
             "deltaTrophy": 10,
-            "deaths": 2
+            "deaths": 4
         },
         {
-            "kills": 4,
+            "kills": 41,
             "isMvp": false,
-            "damage": 42243,
-            "name": "El primo",
-            "deltaTrophy": -7,
-            "deaths": 7
-        },
-        {
-            "kills": 7,
-            "isMvp": false,
-            "damage": 76726,
-            "name": "El primo",
-            "deltaTrophy": -7,
-            "deaths": 7
-        },
-        {
-            "kills": 4,
-            "isMvp": false,
-            "damage": 49359,
-            "name": "Pam",
-            "deltaTrophy": 8,
-            "deaths": 2
+            "damage": 15,
+            "name": "Jerry",
+            "deltaTrophy": 231312321,
+            "deaths": 15
         }
     ],
     "user": "Neo's matches"

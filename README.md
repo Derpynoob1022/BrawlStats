@@ -41,4 +41,30 @@ feel like school work but rather a hobby.
 - As a user, I want to be able to save my list of matches I've added
 - As a user, I want to be able to be able to load my saved logs
 
- 
+
+**Phase 4: Task 2**
+Mon Apr 01 20:03:33 PDT 2024
+[Character: Jerry | Kills: 1 | Deaths: 2 | K/D ratio: 0.50 | Damage: 3 | Star player: false | Trophy gain: +4] has been removed from MatchList
+
+Mon Apr 01 20:03:41 PDT 2024
+[Character: 321 | Kills: 41 | Deaths: 15 | K/D ratio: 2.73 | Damage: 15 | Star player: false | Trophy gain: +231312321] has been added to the MatchList
+
+Mon Apr 01 20:03:51 PDT 2024
+Changed from
+[Character: 321 | Kills: 41 | Deaths: 15 | K/D ratio: 2.73 | Damage: 15 | Star player: false | Trophy gain: +231312321] to
+[Character: Jerry | Kills: 41 | Deaths: 15 | K/D ratio: 2.73 | Damage: 15 | Star player: false | Trophy gain: +231312321]
+
+**Phase 4: Task 3**
+Some refactoring I could've done is that I feel like my MatchList has low cohesion as it performs multiple
+different operations. According to the Single Responsibility Principle, this class shouldn't do too much. So one thing
+I could've done is that I could make a new class called Calculator where it calculates the statistics of list of the matches 
+because the code for calculation currently sits in the MatchList class. This wouldn't necessary make the program 
+run faster but this would make the code easier to understand and easier for me to add new functionality to this project. 
+
+Otherwise, there isn't much else I could find as the coupling of the classes is low and there isn't any design patterns that
+I can implement. 
+
+
+
+
+
